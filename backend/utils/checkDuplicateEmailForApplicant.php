@@ -1,7 +1,7 @@
 <?php
 
 function checkDuplicateEmailForApplicant($email, $pdo){
-        $query = "SELECT COUNT(*) AS total FROM recruitment_candidates WHERE email = :email";
+        $query = "SELECT COUNT(*) AS total FROM applicants WHERE email = :email";
         try {
             $stmt = $pdo->prepare($query);
             $stmt->execute([":email" => $email]);
@@ -11,7 +11,6 @@ function checkDuplicateEmailForApplicant($email, $pdo){
                 $response = [
                     "isExist" => true,
                     "message" => "$email: Email already existing"
-
                 ];
             }else {
                 $response = [

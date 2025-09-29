@@ -2,7 +2,7 @@
 
      function getJobApplicants($pdo) {
     
-        $query = "SELECT * FROM recruitment_candidates";
+        $query = "SELECT * FROM applicants";
         try {
             $stmt = $pdo->prepare($query);
             $stmt->execute();
@@ -22,12 +22,12 @@
     }
 
     function getJobApplicant($id, $pdo) {
-        $query = "SELECT * FROM recruitment_candidates WHERE candidate_id = :candidate_id";
+        $query = "SELECT * FROM applicants WHERE applicant_id = :applicant_id";
 
         try {
             $stmt = $pdo->prepare($query);
             $stmt->execute([
-                ":candidate_id" => $id
+                ":applicant_id" => $id
             ]);
 
             $datas = $stmt->fetch();

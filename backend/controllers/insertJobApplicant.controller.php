@@ -12,17 +12,7 @@ function insertJobApplicant($pdo, $postData, $files) {
     if (!is_dir($targetDirPhoto))  mkdir($targetDirPhoto, 0777, true);
     if (!is_dir($targetDirResume)) mkdir($targetDirResume, 0777, true);
 
-    $requiredFields = ["position", "firstName", "midleName", "lastName", "address", "email", "phoneNumber"];
 
-    // Validate fields
-    foreach ($requiredFields as $field) {
-        if (!isset($postData[$field]) || trim($postData[$field]) === "") {
-            return [
-                "success" => false,
-                "message" => "The $field is missing"
-            ];
-        }
-    }
 
     // Check duplicate email
     $isDuplicateEmail = checkDuplicateEmailForApplicant($postData["email"], $pdo);
@@ -58,22 +48,22 @@ function insertJobApplicant($pdo, $postData, $files) {
     // Insert into DB
     try {
         $stmt = $pdo->prepare("
-            INSERT INTO recruitment_candidates 
-                (job_applied_for, first_name, middle_name, last_name, address, email, phone_number, picture_path, resume_path, status) 
+            INSERT INTO applicants 
+                (job_applied_for, first_name, middle_name, last_name, address, email, phone_number, id_picture_url, resume_url, status) 
             VALUES 
-                (:job_applied_for, :firstName, :midleName, :lastName, :address, :email, :phoneNumber, :photo, :resume, :status)
+                (:job_applied_for, :firstName, :middleName, :lastName, :address, :email, :phoneNumber, :id_picture_url, :resume_url, :status)
         ");
 
         $stmt->execute([
             ':job_applied_for' => $postData['position'],
             ':firstName'       => $postData['firstName'],
-            ':midleName'       => $postData['midleName'],
+            ':middleName'       => $postData['middleName'],
             ':lastName'        => $postData['lastName'],
             ':address'         => $postData['address'],
             ':email'           => $postData['email'],
             ':phoneNumber'     => $postData['phoneNumber'],
-            ':photo'           => $photoPathRel,   // ✅ relative path
-            ':resume'          => $resumePathRel,  // ✅ relative path
+            ':id_picture_url'  => $photoPathRel,   // ✅ relative path
+            ':resume_url'      => $resumePathRel,  // ✅ relative path
             ':status'          => "New"
         ]);
 
