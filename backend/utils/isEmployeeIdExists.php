@@ -1,22 +1,24 @@
 <?php
 
-function checkDuplicateEmailForApplicant($email, $pdo){
-        $query = "SELECT COUNT(*) AS total FROM applicants WHERE email = :email";
+function isEmployeeIdExists($id, $pdo){
+        $query = "SELECT employee_id, COUNT(*) AS total FROM employees WHERE employee_id = :employee_id";
         try {
             $stmt = $pdo->prepare($query);
-            $stmt->execute([":email" => $email]);
-            $isExist = $stmt->fetch();
+            $stmt->execute([":employee_id" => $id]);
+            $row = $stmt->fetch();
 
-            if($isExist && $isExist["total"] > 0) {
+            if($row && $row["total"] > 0) {
                 $response = [
                     "isExist" => true,
-                    "message" => "$email: Email already existing"
+                    "message" => "The employee ID exists",
+                    "employeeId" => $row["total"] 
+                    
                 ];
             }else {
                 $response = [
                     "isExist" => false,
+                    "message" => "The employee ID doesnt exist"
                 ];
-
             }
 
         } catch (PDOException $e) {
@@ -27,6 +29,5 @@ function checkDuplicateEmailForApplicant($email, $pdo){
         }
         return $response;
     }
-
 
 ?>

@@ -1,22 +1,24 @@
 <?php
 
-function checkDuplicateEmailForApplicant($email, $pdo){
-        $query = "SELECT COUNT(*) AS total FROM applicants WHERE email = :email";
+function isRFIDExists($rfid, $pdo){
+        $query = "SELECT COUNT(rfid) AS total, employee_id FROM employees WHERE rfid = :rfid";
         try {
             $stmt = $pdo->prepare($query);
-            $stmt->execute([":email" => $email]);
-            $isExist = $stmt->fetch();
+            $stmt->execute([":rfid" => $rfid]);
+            $row = $stmt->fetch();
 
-            if($isExist && $isExist["total"] > 0) {
+            if($row && $row["total"] > 0) {
                 $response = [
                     "isExist" => true,
-                    "message" => "$email: Email already existing"
+                    "message" => "The employee ID exists",
+                    "employeeId" => $row["employee_id"]
+                    
                 ];
             }else {
                 $response = [
                     "isExist" => false,
+                    "message" => "The employee ID doesnt exist"
                 ];
-
             }
 
         } catch (PDOException $e) {
@@ -27,6 +29,5 @@ function checkDuplicateEmailForApplicant($email, $pdo){
         }
         return $response;
     }
-
 
 ?>

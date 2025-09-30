@@ -1,9 +1,8 @@
 <?php
-// require_once __DIR__ . '/../config/config.php';
+require_once __DIR__ . '/../config/config.php';
 include_once __DIR__ . "/../config/database.php";
-require_once __DIR__ . "/../controllers/getTrend.controller.php";
+require_once __DIR__ . "/../controllers/getSchedule.controller.php";
 include_once __DIR__ . "/../config/cors.php";
-
 
 
 $REQUEST_METHOD = $_SERVER["REQUEST_METHOD"];
@@ -13,14 +12,10 @@ if($REQUEST_METHOD === "GET"){
     $idParams = isset($_GET["id"]) ? $_GET["id"] : null;
     if(!$idParams) {
 
-        http_response_code(400);
-        $response = [
-            "error" => "Missing ID params"
-        ];
-        echo json_encode($response);
-        return;
+        $response = getEmployeeSchedules($pdo);
     } else {
-        $response = getTrends($idParams, $pdo);
+        
+        $response = getEmployeeSchedule($idParams, $pdo);
     }
 
 

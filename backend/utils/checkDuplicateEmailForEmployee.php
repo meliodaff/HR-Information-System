@@ -22,7 +22,7 @@ function checkDuplicateEmailForEmployee($email, $pdo){
 
         } catch (PDOException $e) {
             $response = [
-                    "isExist" => true,
+                    "isExist" => false,
                     "message" => "Error: {$e->getMessage()}"
                 ];
         }
