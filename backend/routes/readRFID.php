@@ -8,6 +8,7 @@ require_once __DIR__ . "/../controllers/timeOut.controller.php";
 require_once __DIR__ . "/../utils/checkIfTimeIn.php";
 require_once __DIR__ . "/../utils/availableToCheckOut.php";
 require_once __DIR__ . "/../utils/checkIfEmployeeHasDuty.php";
+require_once __DIR__ . "/../utils/isDutyDone.php";
 
 $fp = fopen($serialPort, "r");
 if (!$fp) {
@@ -41,6 +42,12 @@ while (true) {
                 continue;
             }
 
+            $isDutyDone = isDutyDone($employeeId, $pdo);
+
+            if($isDutyDone["isDone"]){
+                echo $isDutyDone["message"] . "\n";
+                continue;
+            }
 
             // echo "RFID exists\n";
             // echo "{$response["employeeId"]}\n";
@@ -58,6 +65,8 @@ while (true) {
                     echo "{$isAvailableToCheckOut["message"]}\n";
                     continue;
                 } else {
+
+
                     $responseFromTimeOutController = timeOut($employeeId, $line, $pdo);
                     echo "{$responseFromTimeOutController["message"]}\n";
                     continue;
