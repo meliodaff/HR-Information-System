@@ -57,7 +57,6 @@ FROM employees WHERE employee_id = :employee_id";
                 "message" => "wrong password",
             ];
             }
-
             
         } catch (PDOException $e) {
             $response = [

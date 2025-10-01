@@ -9,6 +9,7 @@ e.last_name,
 taa.schedule_day,
 taa.check_in_time,
 taa.check_out_time,
+taa.attendance_status,
 taa.notes
 FROM employees e
 JOIN time_and_attendance taa
@@ -40,6 +41,7 @@ e.last_name,
 taa.schedule_day,
 taa.check_in_time,
 taa.check_out_time,
+taa.attendance_status,
 taa.notes
 FROM employees e
 JOIN time_and_attendance taa
