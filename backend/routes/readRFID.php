@@ -65,18 +65,13 @@ while (true) {
                     echo "{$isAvailableToCheckOut["message"]}\n";
                     continue;
                 } else {
-
-
                     $responseFromTimeOutController = timeOut($employeeId, $line, $pdo);
                     echo "{$responseFromTimeOutController["message"]}\n";
                     continue;
                 }
-                
             }
-            
-            
             $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
-                echo "{$responseFromTimeInController["message"]}\n";
+            echo "{$responseFromTimeInController["message"]}\n";
             
 
             // HAS TO HANDLE TIME OUT DUPLICATION
