@@ -88,7 +88,7 @@ while (true) {
                 continue;
             }
 
-
+            // THIS ALSO NEEDS VALIDATION IF THE EMPLOYEE FORGOT TO TIME OUT
             $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
             echo "{$responseFromTimeInController["message"]}\n";
 
