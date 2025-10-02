@@ -1,5 +1,5 @@
 <?php
-$serialPort = "\\\\.\\COM10"; 
+$serialPort = "\\\\.\\COM11"; 
 $baudRate   = "9600";
 require_once __DIR__ . "/../utils/isRFIDExists.php";
 require_once __DIR__ . "/../config/database.php";
@@ -15,15 +15,20 @@ if (!$fp) {
     die("Error: Unable to open $serialPort");
 }
 
+date_default_timezone_set("Asia/Manila");
+
 while (true) {
     $line = trim(fgets($fp));
-
+    
     if ($line) {
         // Ignore the READY signal, only capture UID
         if ($line !== "READY") {
             // echo "UID: $line\n";
             // echo "endpoint hit";
+
             $response = isRFIDExists($line, $pdo);
+
+            
 
             if(!$response["isExist"]){
                 echo "RFID is not registered\n";
@@ -31,6 +36,8 @@ while (true) {
             }
 
             $employeeId = $response["employeeId"];
+
+          
 
             // WALA PA VALIDATION IF MAY SCHEDULE BA TALAGA THIS DAY SI EMPLOYEE
             // ps -- working on progress na -- done!
@@ -70,9 +77,20 @@ while (true) {
                     continue;
                 }
             }
+
+            if(date("H:i:s") >= '17:00:00') {
+                echo "Time in not available past 5 PM \n";
+                continue;
+            }
+
+            if(date("H:i:s") <= '07:00:00') {
+                echo "Time in not available until 7 AM \n";
+                continue;
+            }
+
+
             $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
             echo "{$responseFromTimeInController["message"]}\n";
-            
 
             // HAS TO HANDLE TIME OUT DUPLICATION
 
