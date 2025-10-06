@@ -1,0 +1,248 @@
+import React, { useState } from 'react';
+import { Camera, Edit } from 'lucide-react';
+import DashboardLayout from '../components/layouts/DashboardLayout';
+import Dashboard from './Dashboard';
+
+export default function EmployeeInformation({ employee, onClose }) {
+  const [activeTab, setActiveTab] = useState('profile'); 
+
+  // Sample attendance data
+  const attendanceRecords = [
+    { date: '09/20/2025', timeIn: '10:00 AM', timeOut: '10:00 AM', remarks: 'Present' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' },
+    { date: '09/20/2025', timeIn: '', timeOut: '', remarks: '' }
+  ];
+
+  const attendanceSummary = {
+    present: 20,
+    absent: 1,
+    late: 0,
+    leave: 2,
+    leaveBalance: 5
+  };
+
+  return (
+    <DashboardLayout>
+    <div className="min-h-screen bg-gray-50 p-4 sm:p-6 lg:p-8">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-3xl sm:text-4xl font-black text-gray-900">PROFILE</h1>
+          <button
+            onClick={onClose}
+            className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+            title="Close"
+          >
+            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        {/* Profile Card */}
+        <div className="bg-white rounded-xl shadow-md p-6 mb-6">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+            {/* Profile Pic */}
+            <div className="relative">
+              <div className="w-24 h-24 sm:w-32 sm:h-32 bg-blue-100 rounded-xl overflow-hidden">
+                <img 
+                  src="src/assets/images/profile.jpg" 
+                  alt={employee?.name || 'Employee'}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
+
+            {/* Profile */}
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-1">
+                {employee?.name || 'Sphere Star'}
+              </h2>
+              <p className="text-sm text-gray-600 mb-1">
+                {employee?.position || 'Vet Assistant'}
+              </p>
+              <p className="text-sm text-gray-600">
+                {employee?.email || 'spherestar@gmail.com'}
+              </p>
+            </div>
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-2 mt-6 border-t pt-4">
+            <button
+              onClick={() => setActiveTab('profile')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                activeTab === 'profile'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" />
+              </svg>
+              PROFILE
+            </button>
+            <button
+              onClick={() => setActiveTab('attendance')}
+              className={`px-4 py-2 rounded-lg font-semibold text-sm transition-all ${
+                activeTab === 'attendance'
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+              }`}
+            >
+              ATTENDANCE
+            </button>
+          </div>
+        </div>
+
+        {/* Profile Tab Content */}
+        {activeTab === 'profile' && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            {/* Profile Information */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-black text-gray-900">PROFILE INFORMATION</h3>
+                <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                  <Edit className="w-4 h-4 text-gray-600" />
+                </button>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-32 flex-shrink-0">🎂 Birthdate:</span>
+                  <span className="text-sm text-gray-900">September 02, 2000</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-32 flex-shrink-0">📍 Address:</span>
+                  <span className="text-sm text-gray-900">Quezon City</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-32 flex-shrink-0">📞 Contact No:</span>
+                  <span className="text-sm text-gray-900">09090909090</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-32 flex-shrink-0">📧 Email:</span>
+                  <span className="text-sm text-gray-900">{employee?.email || 'spherestar@gmail.com'}</span>
+                </div>
+              </div>
+
+              {/* Benefits Section */}
+              <div className="mt-6 pt-6 border-t">
+                <div className="flex items-center justify-between mb-4">
+                  <h4 className="text-base font-bold text-gray-900">Benefits</h4>
+                  <button className="p-2 hover:bg-gray-100 rounded-lg transition-colors">
+                    <Edit className="w-4 h-4 text-gray-600" />
+                  </button>
+                </div>
+                <div className="bg-gray-50 rounded-lg p-4 min-h-[100px]">
+                  <p className="text-sm text-gray-500">No benefits information added yet.</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Employment Information */}
+            <div className="bg-white rounded-xl shadow-md p-6">
+              <h3 className="text-lg font-black text-gray-900 mb-4">Employment Information</h3>
+
+              <div className="space-y-3">
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-40 flex-shrink-0">💼 Employee ID:</span>
+                  <span className="text-sm text-gray-900">{employee?.id || 'VC-012'}</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-40 flex-shrink-0">🏢 Department:</span>
+                  <span className="text-sm text-gray-900">Vet Team</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-40 flex-shrink-0">📅 Date Hired:</span>
+                  <span className="text-sm text-gray-900">09/20/2024</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-40 flex-shrink-0">⏰ Employment Type:</span>
+                  <span className="text-sm text-gray-900">Full-Time</span>
+                </div>
+                <div className="flex items-start">
+                  <span className="text-sm text-gray-600 w-40 flex-shrink-0">📋 Schedule:</span>
+                  <span className="text-sm text-gray-900">Monday - Saturday<br />8:00 AM - 5PM</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Attendance Tab Content */}
+        {activeTab === 'attendance' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            {/* Attendance Record */}
+            <div className="lg:col-span-2 bg-white rounded-xl shadow-md p-6">
+              <h3 className="text-lg font-black text-gray-900 mb-4">ATTENDANCE RECORD</h3>
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead className="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                      <th className="px-4 py-3 text-left font-black text-gray-900 uppercase">Date</th>
+                      <th className="px-4 py-3 text-left font-black text-gray-900 uppercase">Time In</th>
+                      <th className="px-4 py-3 text-left font-black text-gray-900 uppercase">Time Out</th>
+                      <th className="px-4 py-3 text-left font-black text-gray-900 uppercase">Remarks</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-100">
+                    {attendanceRecords.map((record, index) => (
+                      <tr key={index} className="hover:bg-gray-50">
+                        <td className="px-4 py-3 text-gray-900">{record.date}</td>
+                        <td className="px-4 py-3 text-gray-900">{record.timeIn}</td>
+                        <td className="px-4 py-3 text-gray-900">{record.timeOut}</td>
+                        <td className="px-4 py-3">
+                          {record.remarks && (
+                            <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-green-100 text-green-800">
+                              {record.remarks}
+                            </span>
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* Attendance Summary */}
+            <div className="bg-gradient-to-br from-blue-100 to-blue-50 rounded-xl shadow-md p-6">
+              <h3 className="text-lg font-black text-gray-900 mb-4">ATTENDANCE SUMMARY</h3>
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-gray-700">PRESENT:</span>
+                  <span className="text-xl font-black text-gray-900">{attendanceSummary.present}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-gray-700">ABSENT:</span>
+                  <span className="text-xl font-black text-gray-900">{attendanceSummary.absent}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-gray-700">LATE:</span>
+                  <span className="text-xl font-black text-gray-900">{attendanceSummary.late}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                  <span className="text-sm font-semibold text-gray-700">LEAVE:</span>
+                  <span className="text-xl font-black text-gray-900">{attendanceSummary.leave}</span>
+                </div>
+                <div className="flex justify-between items-center pt-4 border-t border-blue-200">
+                  <span className="text-sm font-semibold text-gray-700">LEAVE BALANCE:</span>
+                  <span className="text-xl font-black text-gray-900">{attendanceSummary.leaveBalance}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+    </DashboardLayout>
+  );
+}
