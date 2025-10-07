@@ -23,12 +23,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       {/* <Homepage /> */}
       {/* <JobOffer /> */}
       {/* <Applicant /> */}
-      <JobApplicationForm />
+      {/* <JobApplicationForm /> */}
       {/* still has bugs */}
       {/* <Employees /> */}
       {/* <AdminAnalytics /> */}
       {/* <AdminSchedule /> */}
-      {/* <LeaveRequest /> */}
+      <LeaveRequest />
       {/* <EmployeeIncentives /> */}
     </BrowserRouter>
   </React.StrictMode>

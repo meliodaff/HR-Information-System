@@ -2,6 +2,7 @@
     include_once __DIR__ . "/../config/database.php";
     // require_once __DIR__ . "/../utils/checkDuplicateEmailForEmployee.php";
     require_once __DIR__ . "/../utils/checkLeaveRequestBalance.php";
+    require_once __DIR__ . "/../utils/checkLeaveRequestPending.php";
     function insertLeaveRequest($pdo, $leaveDetails, $files){
 
         
@@ -12,15 +13,24 @@
             ];
         }
 
-        $response = checkLeaveRequestBalance($leaveDetails["employeeId"], $pdo);
+        $hasRequestBalance = checkLeaveRequestBalance($leaveDetails["employeeId"], $pdo);
 
-        if(!$response["canRequest"]){
+        if(!$hasRequestBalance["canRequest"]){
             http_response_code(403);
             return [
                 "success" => false,
-                "message" => $response["message"]
-            ]
-            ;
+                "message" => $hasRequestBalance["message"]
+            ];
+        }
+
+        $hasRequestPending = checkLeaveRequestPending($leaveDetails["employeeId"], $pdo);
+
+        if($hasRequestPending["hasPending"]){
+            http_response_code(403);
+            return [
+                "success" => false,
+                "message" => $hasRequestPending["message"]
+            ];
         }
 
         $targetDirDocument = __DIR__ . "/../uploads/supportingDocuments/";
