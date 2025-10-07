@@ -1,88 +1,114 @@
-import React, { useState } from 'react';
-import SuccessModal from '../components/modals/SucessModal';
-import Navbar from '../components/navbar';
-
+import React, { useState } from "react";
+import SuccessModal from "../components/modals/SucessModal";
+import Navbar from "../components/navbar";
+import useInsertJobApplicant from "../api/useInsertJobApplicant";
 export default function JobApplicationForm() {
+  const {
+    response,
+    insertJobApplicant,
+    loadingForJobApplicant,
+    errorForJobApplicant,
+  } = useInsertJobApplicant();
   const [formData, setFormData] = useState({
-    position: '',
-    firstName: '',
-    lastName: '',
-    middleName: '',
-    address: '',
-    contactNo: '',
-    email: '',
-    privacyConsent: false
+    position: "",
+    firstName: "",
+    lastName: "",
+    middleName: "",
+    address: "",
+    contactNo: "",
+    email: "",
+    privacyConsent: false,
   });
 
   const [files, setFiles] = useState({
     idPicture: null,
-    resume: null
+    resume: null,
   });
 
   const [isSubmitted, setIsSubmitted] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: type === 'checkbox' ? checked : value
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
   const handleFileChange = (e, fileType) => {
     const file = e.target.files[0];
     if (file) {
-      setFiles(prev => ({
+      setFiles((prev) => ({
         ...prev,
-        [fileType]: file
+        [fileType]: file,
       }));
     }
   };
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!formData.privacyConsent) {
-      alert('Please agree to the Privacy Policy to submit your application.');
+      alert("Please agree to the Privacy Policy to submit your application.");
       return;
     }
-    
-    if (!formData.position || !formData.firstName || !formData.lastName || !formData.middleName) {
-      alert('Please fill in all required fields.');
+
+    if (
+      !formData.position ||
+      !formData.firstName ||
+      !formData.lastName ||
+      !formData.middleName
+    ) {
+      alert("Please fill in all required fields.");
       return;
     }
-    
+
     if (!files.idPicture || !files.resume) {
-      alert('Please upload both ID picture and resume.');
+      alert("Please upload both ID picture and resume.");
       return;
     }
-    
+
     if (formData.contactNo.length !== 11) {
       alert("Contact number must be exactly 11 digits!");
       return;
     }
-    
-    console.log('Form Data:', formData);
-    console.log('Files:', files);
-    
+
+    // console.log("Form Data:", formData);
+    // console.log("Files:", files);
+
+    const form = {
+      ...formData,
+      phoneNumber: formData.contactNo,
+      resume: files.resume,
+      photo: files.idPicture,
+    };
+
+    await insertJobApplicant(form);
+
+    if (!response.success) {
+      console.log(errorForJobApplicant);
+      alert(errorForJobApplicant.response.data.message);
+    } else {
+      console.log(response);
+      setIsSubmitted(true);
+    }
     // Show success modal
-    setIsSubmitted(true);
   };
 
   const handleCloseModal = () => {
     setIsSubmitted(false);
     // Reset form
     setFormData({
-      position: '',
-      firstName: '',
-      lastName: '',
-      middleName: '',
-      address: '',
-      contactNo: '',
-      email: '',
-      privacyConsent: false
+      position: "",
+      firstName: "",
+      lastName: "",
+      middleName: "",
+      address: "",
+      contactNo: "",
+      email: "",
+      privacyConsent: false,
     });
     setFiles({
       idPicture: null,
-      resume: null
+      resume: null,
     });
   };
 
@@ -117,8 +143,18 @@ export default function JobApplicationForm() {
                   <option value="receptionist">Receptionist</option>
                 </select>
                 <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                  <svg className="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                  <svg
+                    className="w-5 h-5 text-gray-400"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </div>
               </div>
@@ -130,16 +166,18 @@ export default function JobApplicationForm() {
                 <span className="text-red-500">*</span>1x1 ID Picture:
               </label>
               <label className="flex items-center justify-center w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors">
-                <span className="font-semibold text-sm sm:text-base">Choose files</span>
+                <span className="font-semibold text-sm sm:text-base">
+                  Choose files
+                </span>
                 <input
                   type="file"
                   accept=".jpg,.jpeg,.png"
-                  onChange={(e) => handleFileChange(e, 'idPicture')}
+                  onChange={(e) => handleFileChange(e, "idPicture")}
                   className="hidden"
                 />
               </label>
               <p className="text-xs text-gray-600 mt-1 truncate">
-                {files.idPicture ? files.idPicture.name : 'No file Choosen'}
+                {files.idPicture ? files.idPicture.name : "No file Choosen"}
               </p>
               <p className="text-xs text-gray-400 mt-1">
                 Accepted file types: jpg, png, Max. file size: 1 MB.
@@ -152,16 +190,18 @@ export default function JobApplicationForm() {
                 <span className="text-red-500">*</span>Resume:
               </label>
               <label className="flex items-center justify-center w-full px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-500 text-white rounded-lg cursor-pointer hover:bg-blue-600 transition-colors">
-                <span className="font-semibold text-sm sm:text-base">Choose files</span>
+                <span className="font-semibold text-sm sm:text-base">
+                  Choose files
+                </span>
                 <input
                   type="file"
                   accept=".pdf,.doc,.docx"
-                  onChange={(e) => handleFileChange(e, 'resume')}
+                  onChange={(e) => handleFileChange(e, "resume")}
                   className="hidden"
                 />
               </label>
               <p className="text-xs text-gray-600 mt-1 truncate">
-                {files.resume ? files.resume.name : 'No file Choosen'}
+                {files.resume ? files.resume.name : "No file Choosen"}
               </p>
               <p className="text-xs text-gray-400 mt-1">
                 Max. file size: 2 MB.
@@ -282,7 +322,11 @@ export default function JobApplicationForm() {
               </label>
             </div>
             <p className="text-xs sm:text-sm text-gray-600 italic leading-relaxed pl-0 sm:pl-7">
-              By clicking Submit, you agree to Fur Ever Vet Clinic's Privacy Policy. Your information will be used only for documentation and official purposes, kept secure by authorized personnel, and stored for up to three (3) years in compliance with the Data Privacy Act of 2012.
+              By clicking Submit, you agree to Fur Ever Vet Clinic's Privacy
+              Policy. Your information will be used only for documentation and
+              official purposes, kept secure by authorized personnel, and stored
+              for up to three (3) years in compliance with the Data Privacy Act
+              of 2012.
             </p>
           </div>
 
