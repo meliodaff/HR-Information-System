@@ -18,5 +18,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode($response);
 } else {
     http_response_code(405);
-    echo json_encode(["success" => false, "message" => "Method not allowed"]);
+    echo json_encode(["success" => false, "message" => "Internal server error"]);
 }

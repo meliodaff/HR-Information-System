@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . "/../config/database.php";
 
-function checkLeaveRequest($employeeId, $pdo){
+function checkLeaveRequestBalance($employeeId, $pdo){
     $query = "SELECT
 	e.employee_id,
 	e.first_name,

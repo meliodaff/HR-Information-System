@@ -3,12 +3,8 @@ import SuccessModal from "../components/modals/SucessModal";
 import Navbar from "../components/navbar";
 import useInsertJobApplicant from "../api/useInsertJobApplicant";
 export default function JobApplicationForm() {
-  const {
-    response,
-    insertJobApplicant,
-    loadingForJobApplicant,
-    errorForJobApplicant,
-  } = useInsertJobApplicant();
+  const { insertJobApplicant, loadingForJobApplicant } =
+    useInsertJobApplicant();
   const [formData, setFormData] = useState({
     position: "",
     firstName: "",
@@ -81,15 +77,16 @@ export default function JobApplicationForm() {
       photo: files.idPicture,
     };
 
-    await insertJobApplicant(form);
+    const response = await insertJobApplicant(form);
 
     if (!response.success) {
-      console.log(errorForJobApplicant);
-      alert(errorForJobApplicant.response.data.message);
-    } else {
       console.log(response);
-      setIsSubmitted(true);
+      alert(response.message);
+      return;
     }
+
+    setIsSubmitted(true);
+
     // Show success modal
   };
 

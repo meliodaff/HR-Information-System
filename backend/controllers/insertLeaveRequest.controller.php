@@ -1,17 +1,18 @@
 <?php
     include_once __DIR__ . "/../config/database.php";
     // require_once __DIR__ . "/../utils/checkDuplicateEmailForEmployee.php";
-    require_once __DIR__ . "/../utils/checkLeaveRequest.php";
+    require_once __DIR__ . "/../utils/checkLeaveRequestBalance.php";
     function insertLeaveRequest($pdo, $leaveDetails, $files){
 
         
         if(!$files){
             return [
-                "error" => "Documenting support missing"
+                "success" => false,
+                "message" => "Documenting support missing"
             ];
         }
 
-        $response = checkLeaveRequest($leaveDetails["employeeId"], $pdo);
+        $response = checkLeaveRequestBalance($leaveDetails["employeeId"], $pdo);
 
         if(!$response["canRequest"]){
             http_response_code(403);

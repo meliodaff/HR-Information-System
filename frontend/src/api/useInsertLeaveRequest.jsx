@@ -1,15 +1,15 @@
 import { useState } from "react";
 import axios from "./axiosInstance";
 
-const useInsertJobApplicant = () => {
-  const [loadingForJobApplicant, setLoadingForJobApplicant] = useState(false);
+const useInsertLeaveRequest = () => {
+  const [loadingForLeaveRequest, setLoadingForLeaveRequest] = useState(false);
 
-  const insertJobApplicant = async (jobApplicant) => {
+  const insertLeaveRequest = async (leaveRequest) => {
+    setLoadingForLeaveRequest(true);
     try {
-      setLoadingForJobApplicant(true);
       const response = await axios.post(
-        "/insertJobApplicant.php",
-        jobApplicant
+        "/insertLeaveRequest.php",
+        leaveRequest
       );
       return response.data;
     } catch (error) {
@@ -24,14 +24,14 @@ const useInsertJobApplicant = () => {
         message: "API calling failed",
       };
     } finally {
-      setLoadingForJobApplicant(false);
+      setLoadingForLeaveRequest(false);
     }
   };
 
   return {
-    insertJobApplicant,
-    loadingForJobApplicant,
+    insertLeaveRequest,
+    loadingForLeaveRequest,
   };
 };
 
-export default useInsertJobApplicant;
+export default useInsertLeaveRequest;
