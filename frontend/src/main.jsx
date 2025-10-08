@@ -24,9 +24,9 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       {/* <JobOffer /> */}
       {/* <Applicant /> */}
       {/* <JobApplicationForm /> */}
-      {/* <Employees /> */}
+      <Employees />
       {/* <AdminAnalytics /> */}
-      <AdminSchedule />
+      {/* <AdminSchedule /> employee schedule not done yet */}
       {/* <LeaveRequest /> */}
       {/* <EmployeeIncentives /> */}
     </BrowserRouter>

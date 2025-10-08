@@ -26,14 +26,22 @@ export default function AttendanceSchedule() {
   const [attendanceData, setAttendanceData] = useState([]);
 
   useEffect(() => {
-    const getAttendanceRecordsFunc = async () => {
-      const response = await getAttendanceRecords(selectedDate);
-      // console.log(response);
+    const fetchAttendance = async () => {
+      let response;
+      const today = new Date();
+      const isToday = selectedDate.toDateString() === today.toDateString();
+
+      if (isToday) {
+        response = await getAttendanceRecordsForToday();
+      } else {
+        response = await getAttendanceRecords(selectedDate);
+      }
+
       if (!response.success) {
         alert(response.message);
         return;
       }
-      // console.log(response.data);
+
       const normalizedData = response.data.map((data) => ({
         employeeId: String(data.employee_id),
         name: data.first_name + " " + data.last_name,
@@ -43,86 +51,12 @@ export default function AttendanceSchedule() {
         timeOut: data.check_out_time,
         remarks: data.attendance_status,
       }));
+
       setAttendanceData(normalizedData);
-      // console.log(normalizedData);
     };
-    console.log("re rendering");
-    getAttendanceRecordsFunc();
+
+    fetchAttendance();
   }, [selectedDate]);
-
-  useEffect(() => {
-    const getAttendanceRecordsForTodayFunc = async () => {
-      const response = await getAttendanceRecordsForToday();
-      // console.log(response);
-      if (!response.success) {
-        alert(response.message);
-        return;
-      }
-      // console.log(response.data);
-      const normalizedData = response.data.map((data) => ({
-        employeeId: String(data.employee_id),
-        name: data.first_name + " " + data.last_name,
-        department: data.department,
-        position: data.position,
-        timeIn: data.check_in_time,
-        timeOut: data.check_out_time,
-        remarks: data.attendance_status,
-      }));
-      setAttendanceData(normalizedData);
-      // console.log(normalizedData);
-    };
-
-    getAttendanceRecordsForTodayFunc();
-  }, []);
-
-  // Sample attendance data
-  // // const attendanceData = [
-  // //   {
-  // //     employeeId: "VT-12345",
-  // //     name: "Sphere Star",
-  // //     department: "VETERINARIAN",
-  // //     position: "ASSISTANT VET",
-  // //     timeIn: "10:00 AM",
-  // //     timeOut: "10:02 AM",
-  // //     remarks: "LATE",
-  // //   },
-  // //   {
-  // //     employeeId: "VT-22345",
-  // //     name: "Mean Arthur",
-  // //     department: "GROOMING",
-  // //     position: "GROOMER",
-  // //     timeIn: "09:00 AM",
-  // //     timeOut: "05:00 PM",
-  // //     remarks: "",
-  // //   },
-  // //   {
-  // //     employeeId: "VT-32345",
-  // //     name: "Juan Dela Cruz",
-  // //     department: "FRONT DESK",
-  // //     position: "RECEPTIONIST",
-  // //     timeIn: "08:30 AM",
-  // //     timeOut: "04:30 PM",
-  // //     remarks: "",
-  // //   },
-  // //   {
-  // //     employeeId: "VT-42345",
-  // //     name: "Maria Santos",
-  // //     department: "VETERINARIAN",
-  // //     position: "VET ASSISTANT",
-  // //     timeIn: "",
-  // //     timeOut: "",
-  // //     remarks: "ABSENT",
-  // //   },
-  // //   {
-  // //     employeeId: "VT-55345",
-  // //     name: "Pedro Reyes",
-  // //     department: "GROOMING",
-  // //     position: "GROOMER",
-  // //     timeIn: "09:15 AM",
-  // //     timeOut: "05:15 PM",
-  // //     remarks: "",
-  // //   },
-  // ];
 
   // Sample schedule data
   const [scheduleData, setScheduleData] = useState([

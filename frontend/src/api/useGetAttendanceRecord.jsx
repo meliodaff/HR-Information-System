@@ -17,6 +17,10 @@ const useGetAttendanceRecord = () => {
 
   const [loadingForGetAttendanceRecord, setLoadingForGetAttendanceRecord] =
     useState(false);
+  const [
+    loadingForGetAttendanceRecordForMonth,
+    setLoadingForGetAttendanceRecordForMonth,
+  ] = useState(false);
 
   const getAttendanceRecords = async (date) => {
     const newDate = new Date(date).toISOString().split("T")[0];
@@ -112,6 +116,29 @@ const useGetAttendanceRecord = () => {
     }
   };
 
+  const getAttendanceRecordForMonth = async (employeeId, month) => {
+    try {
+      setLoadingForGetAttendanceRecordForMonth(true);
+      const response = await axios.get(
+        `/getAttendanceRecord.php?id=${employeeId}&month=${month}`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.status >= 400) {
+        return {
+          success: false,
+          message: error.response.data.message,
+        };
+      }
+      return {
+        success: false,
+        message: "API calling failed",
+      };
+    } finally {
+      setLoadingForGetAttendanceRecordForMonth(false);
+    }
+  };
+
   return {
     getAttendanceRecords,
     loadingForGetAttendanceRecords,
@@ -121,6 +148,8 @@ const useGetAttendanceRecord = () => {
     getAttendanceRecordForToday,
     loadingForGetAttendanceRecordForToday,
     loadingForGetAttendanceRecord,
+    loadingForGetAttendanceRecordForMonth,
+    getAttendanceRecordForMonth,
   };
 };
 

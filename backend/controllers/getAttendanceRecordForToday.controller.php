@@ -24,6 +24,7 @@ LEFT JOIN time_and_attendance taa
     AND DATE(taa.check_in_time) = CURDATE()  -- today's attendance
 ORDER BY e.employee_id;
 
+
 ";
         try {
             $stmt = $pdo->prepare($query);

@@ -13,10 +13,15 @@ $REQUEST_METHOD = $_SERVER["REQUEST_METHOD"];
 if($REQUEST_METHOD === "GET"){
     $idParams = isset($_GET["id"]) ? $_GET["id"] : null;
     $date = isset($_GET["date"]) ? $_GET["date"] : null;
+    $month = isset($_GET["month"]) ? $_GET["month"] : null;
     if($idParams && $date) {
         $response = getAttendanceRecord($idParams, $date, $pdo);
 
-    } else if($idParams) {
+    }
+    else if ($idParams && $month){
+        $response = getAttendanceRecordForTheMonth($idParams, $month, $pdo);
+    } 
+    else if($idParams) {
         // employeee id attendance record for today
         $response = getAttendanceRecordForToday($idParams, $pdo);
     } else if($date) {

@@ -1,45 +1,49 @@
 import React, { useState, useMemo, useEffect } from "react";
 import { MoreVertical, Search } from "lucide-react";
 import DashboardLayout from "../components/layouts/DashboardLayout";
+import useGetJobApplicants from "../api/useGetApplicant";
 
 export default function ApplicantsTable() {
   const [activeMenuId, setActiveMenuId] = useState(null);
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [statusFilter, setStatusFilter] = useState("all"); 
-  const [dateSort, setDateSort] = useState("none"); 
+  const [statusFilter, setStatusFilter] = useState("all");
+  const [dateSort, setDateSort] = useState("none");
+  const { getJobApplicants, loadingForGetJobApplicant } = useGetJobApplicants();
+  useEffect(() => {
+    const useGetJobApplicantsFunc = async () => {
+      const response = await getJobApplicants();
+      console.log(response);
+      if (!response.success) {
+        alert(response.message);
+        return;
+      }
 
-  const [applicants, setApplicants] = useState([
-    {
-      id: "A001",
-      fullName: "Juan Dela Cruz",
-      position: "Veterinarian",
-      email: "juan@example.com",
-      resume: "resume.pdf",
-      status: "New",
-      createdAt: "2025-09-20T10:00:00Z",
-    },
-    {
-      id: "A002",
-      fullName: "Maria Santos",
-      position: "Assistant",
-      email: "maria@example.com",
-      resume: "resume.pdf",
-      status: "Under Review",
-      createdAt: "2025-09-18T09:00:00Z",
-    },
-    {
-      id: "A003",
-      fullName: "Pedro Reyes",
-      position: "Receptionist",
-      email: "pedro@example.com",
-      resume: "resume.pdf",
-      status: "Rejected",
-      createdAt: "2025-09-22T14:30:00Z",
-    },
-  ]);
+      const formattedData = response.data.map((record) => ({
+        id: String(record.applicant_id),
+        fullName: record.first_name + " " + record.last_name,
+        position: record.job_applied_for,
+        email: record.email,
+        resume: record.resume_url ? record.resume_url : "No Resume Attached",
+        status: record.status,
+        createdAt: record.application_date,
+      }));
 
-  const statusOptions = ["New", "Under Review", "For Interview", "Hired", "Rejected"];
+      setApplicants(formattedData);
+    };
+
+    useGetJobApplicantsFunc();
+  }, []);
+
+  const [applicants, setApplicants] = useState([]);
+
+  const statusOptions = [
+    "New",
+    "Under Review",
+    "For Interview",
+    "Hired",
+    "Rejected",
+  ];
 
   // Toggle dropdown
   const toggleMenu = (id) => {
@@ -48,11 +52,13 @@ export default function ApplicantsTable() {
 
   // Update applicant status by id
   const updateStatusById = (id, newStatus) => {
-    setApplicants((prev) => prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a)));
+    setApplicants((prev) =>
+      prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
+    );
     setActiveMenuId(null);
   };
 
-  // Filter + sort logic 
+  // Filter + sort logic
   const filteredApplicants = useMemo(() => {
     const term = searchTerm.trim().toLowerCase();
 
@@ -138,7 +144,9 @@ export default function ApplicantsTable() {
 
       {/* Secondary label on the top-right */}
       <div className="flex justify-end mb-3">
-        <div className="text-sm text-gray-500 font-medium">Applicant Information Details</div>
+        <div className="text-sm text-gray-500 font-medium">
+          Applicant Information Details
+        </div>
       </div>
 
       {/* Table */}
@@ -173,18 +181,47 @@ export default function ApplicantsTable() {
           <tbody className="bg-white divide-y divide-gray-200">
             {filteredApplicants.length > 0 ? (
               filteredApplicants.map((applicant) => (
-                <tr key={applicant.id} className="hover:bg-gray-50 transition-colors">
-                  <td className="px-3 py-4 text-sm text-gray-900">{applicant.id}</td>
-                  <td className="px-3 py-4 text-sm text-gray-900">{applicant.fullName}</td>
-                  <td className="px-3 py-4 text-sm text-gray-900">{applicant.position}</td>
-                  <td className="px-3 py-4 text-sm text-gray-900 hidden md:table-cell">{applicant.email}</td>
-                  <td className="px-3 py-4 text-sm text-blue-600 hover:underline cursor-pointer hidden sm:table-cell">
-                    {applicant.resume}
+                <tr
+                  key={applicant.id}
+                  className="hover:bg-gray-50 transition-colors"
+                >
+                  <td className="px-3 py-4 text-sm text-gray-900">
+                    {applicant.id}
+                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-900">
+                    {applicant.fullName}
+                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-900">
+                    {applicant.position}
+                  </td>
+                  <td className="px-3 py-4 text-sm text-gray-900 hidden md:table-cell">
+                    {applicant.email}
+                  </td>
+                  <td
+                    className={`px-3 py-4 text-sm ${
+                      applicant.resume !== "No Resume Attached" &&
+                      "text-blue-600 hover:underline cursor-pointer"
+                    } hidden sm:table-cell`}
+                  >
+                    {applicant.resume === "No Resume Attached" ? (
+                      applicant.resume
+                    ) : (
+                      <a
+                        href={`
+                          http://localhost/hr-information-system/backend/${applicant.resume}
+                          `}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        {applicant.resume.split("/")[2]}
+                      </a>
+                    )}
                   </td>
                   <td className="px-3 py-4 whitespace-nowrap">
                     <span
                       className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                        statusColors[applicant.status] || "bg-gray-100 text-gray-800"
+                        statusColors[applicant.status] ||
+                        "bg-gray-100 text-gray-800"
                       }`}
                     >
                       {applicant.status}
@@ -206,7 +243,9 @@ export default function ApplicantsTable() {
                           {statusOptions.map((option) => (
                             <button
                               key={option}
-                              onClick={() => updateStatusById(applicant.id, option)}
+                              onClick={() =>
+                                updateStatusById(applicant.id, option)
+                              }
                               className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors"
                             >
                               {option}
@@ -220,7 +259,10 @@ export default function ApplicantsTable() {
               ))
             ) : (
               <tr>
-                <td colSpan="7" className="px-3 py-6 text-center text-sm text-gray-500">
+                <td
+                  colSpan="7"
+                  className="px-3 py-6 text-center text-sm text-gray-500"
+                >
                   No applicants found.
                 </td>
               </tr>
