@@ -19,7 +19,7 @@ import EmployeeIncentives from "./pages/EmployeeIncentives";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      {/* <EmployeeIncentives/> */}
+      {/* <EmployeeIncentives /> */}
       {/* <Homepage /> */}
       {/* <JobOffer /> */}
       {/* <Applicant /> */}

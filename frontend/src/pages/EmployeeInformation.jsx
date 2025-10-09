@@ -402,7 +402,7 @@ export default function EmployeeInformation({ employee, onClose }) {
                       VACATION LEAVE:
                     </span>
                     <span className="text-xl font-black text-gray-900">
-                      {attendanceSummary.leave[0].leave_remaining}
+                      {attendanceSummary.leave[0].leave_remaining} / 10
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -410,18 +410,19 @@ export default function EmployeeInformation({ employee, onClose }) {
                       SICK LEAVE:
                     </span>
                     <span className="text-xl font-black text-gray-900">
-                      {attendanceSummary.leave[1].leave_remaining}
+                      {attendanceSummary.leave[1].leave_remaining} / 10
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-semibold text-gray-700">
                       {employeeInformation.gender === "Male"
                         ? "PATERNITY"
-                        : "MATERNITY"}{" "}
+                        : "MATERNITY"}
                       LEAVE:
                     </span>
                     <span className="text-xl font-black text-gray-900">
-                      {attendanceSummary.leave[2].leave_remaining}
+                      {attendanceSummary.leave[2].leave_remaining} /
+                      {employeeInformation.gender === "Male" ? "7" : "105"}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -429,7 +430,7 @@ export default function EmployeeInformation({ employee, onClose }) {
                       EMERGENCY LEAVE:
                     </span>
                     <span className="text-xl font-black text-gray-900">
-                      {attendanceSummary.leave[3].leave_remaining}
+                      {attendanceSummary.leave[3].leave_remaining} / 3
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-blue-200">

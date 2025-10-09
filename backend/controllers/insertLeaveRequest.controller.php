@@ -73,15 +73,19 @@ VALUES (:employee_id, :leave_type_id, :start_date, :end_date, 'Pending', :reason
              ];
              }
 
-             $query2 = "UPDATE leave_balances SET days_remaining = days_remaining - 1 WHERE employee_id = :employee_id";
+             $query2 = "UPDATE leave_balances SET days_remaining = days_remaining - 1 WHERE employee_id = :employee_id AND leave_type_id = :leave_type_id";
 
              $stmt2 = $pdo->prepare($query2);
 
-             $decrementLeaveBalancesResponse = $stmt2->execute([
-                ":employee_id" => $leaveDetails["employeeId"]
+
+             // this should decrement on how many days the user has intended to take the leave
+             // and this shouldnt decrement immediately, it should be decremented once the request was approved
+             $decrementLeaveBalancesResponse = $stmt2->execute([ 
+                ":employee_id" => $leaveDetails["employeeId"],
+                ":leave_type_id" => $leaveDetails["leaveTypeId"]
              ]);
 
-             $query3 = "UPDATE leave_balances SET days_taken = days_taken + 1 WHERE employee_id = :employee_id"; 
+             $query3 = "UPDATE leave_balances SET days_taken = days_taken + 1 WHERE employee_id = :employee_id AND leave_type_id = :leave_type_id"; 
 
              $stmt3 = $pdo->prepare($query3);
 
@@ -93,7 +97,8 @@ VALUES (:employee_id, :leave_type_id, :start_date, :end_date, 'Pending', :reason
              }
              
              $incrementDaysTaken = $stmt3->execute([
-                 ":employee_id" => $leaveDetails["employeeId"]
+                 ":employee_id" => $leaveDetails["employeeId"],
+                ":leave_type_id" => $leaveDetails["leaveTypeId"]
                 ]);
                 
                 if($stmt3->rowCount() <= 0){

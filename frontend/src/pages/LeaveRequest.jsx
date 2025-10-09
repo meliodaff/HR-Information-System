@@ -27,7 +27,8 @@ export default function LeaveRequest() {
     name: "Jv Bialen",
     position: "Veterinarian",
     email: "test@gmail.com",
-    id: 5,
+    gender: "Male",
+    id: 1,
   };
 
   // Calendar setup
@@ -322,8 +323,11 @@ export default function LeaveRequest() {
                         <option value="2">Sick Leave</option>
                         <option value="1">Vacation Leave</option>
                         <option value="5">Emergency Leave</option>
-                        <option value="3">Maternity Leave</option>
-                        <option value="4">Paternity Leave</option>
+                        {employee.gender === "Female" ? (
+                          <option value="3">Maternity Leave</option>
+                        ) : (
+                          <option value="4">Paternity Leave</option>
+                        )}
                       </select>
                     </div>
                   </div>
