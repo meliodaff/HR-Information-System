@@ -8,6 +8,7 @@ import useGetAttendanceRecord from "../api/useGetAttendanceRecord";
 export default function EmployeeInformation({ employee, onClose }) {
   const [activeTab, setActiveTab] = useState("profile");
   const [employeeInformation, setEmployeeInformation] = useState([]);
+  const [attendanceSummary, setAttendanceSummary] = useState([]);
   const [
     employeeAttendanceRecordForMonth,
     setEmployeeAttendanceRecordForMonth,
@@ -23,7 +24,8 @@ export default function EmployeeInformation({ employee, onClose }) {
         alert(response.message);
         return;
       }
-      const record = response.data;
+      const record = response.data[0];
+      const schedule = response.data[1];
       const formattedData = {
         birthDate: record.date_of_birth,
         address: record.address,
@@ -32,9 +34,10 @@ export default function EmployeeInformation({ employee, onClose }) {
         department: record.department,
         dateHired: record.hire_date,
         employmentType: record.employment_type,
-        schedule: record.schedule || null,
+        // schedule: record.schedule || null,
+        gender: record.gender,
+        schedule: schedule.schedule_type,
       };
-
       setEmployeeInformation(formattedData);
     };
 
@@ -48,50 +51,49 @@ export default function EmployeeInformation({ employee, onClose }) {
         employee.id,
         currentMonth
       );
-      console.log(response);
-      if (!response.success) {
-        alert(response.message);
+      if (!response[0].success) {
+        alert(response[0].message);
         return;
       }
-      const formattedData = response.data.map((record) => ({
-        date: record.check_in_time.split(" ")[0],
+
+      if (!response[1].success) {
+        alert(response[1].message);
+        return;
+      }
+      const formattedDataAttendanceRecord = response[0].data.map((record) => ({
+        // date: record.check_in_time.split(" ")[0],
+        date: record.schedule_day,
         timeIn: record.check_in_time,
         timeOut: record.check_out_time,
         remarks: record.attendance_status,
       }));
 
-      setEmployeeAttendanceRecordForMonth(formattedData);
+      const attendanceSummary = response[1].data;
+
+      const formattedAttendanceSummary = {
+        present: attendanceSummary.present_count,
+        late: attendanceSummary.late_count,
+        absent: attendanceSummary.absent_count,
+        leave: attendanceSummary.leave,
+        leaveBalance: attendanceSummary.leave_remaining, // needs to change this also to those categories
+      };
+
+      console.log(formattedAttendanceSummary);
+
+      setEmployeeAttendanceRecordForMonth(formattedDataAttendanceRecord);
+      setAttendanceSummary(formattedAttendanceSummary);
     };
 
     useGetAttendanceRecordForMonthFunc();
   }, []);
 
-  // Sample attendance data
-  // const employeeAttendanceRecordForMonth = [
-  //   {
-  //     date: "09/20/2025",
-  //     timeIn: "10:00 AM",
-  //     timeOut: "10:00 AM",
-  //     remarks: "Present",
-  //   },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  //   { date: "09/20/2025", timeIn: "", timeOut: "", remarks: "" },
-  // ];
-
-  const attendanceSummary = {
-    present: 20,
-    absent: 1,
-    late: 0,
-    leave: 2,
-    leaveBalance: 5,
-  };
+  // const attendanceSummary = {
+  //   present: 20,
+  //   absent: 1,
+  //   late: 0,
+  //   leave: 2,
+  //   leaveBalance: 5,
+  // };
 
   return (
     <DashboardLayout>
@@ -294,14 +296,11 @@ export default function EmployeeInformation({ employee, onClose }) {
                       📋 Schedule:
                     </span>
                     <span className="text-sm text-gray-900">
-                      {employeeInformation.schedule ? (
-                        employeeInformation.schedule
-                      ) : (
-                        <div>
-                          Monday - Saturday
-                          <br />
-                          8:00 AM - 5PM
-                        </div>
+                      {employeeInformation.schedule && (
+                        <>
+                          {employeeInformation.schedule} <br />
+                          9:00 AM - 5:00 PM
+                        </>
                       )}
                     </span>
                   </div>
@@ -400,10 +399,37 @@ export default function EmployeeInformation({ employee, onClose }) {
                   </div>
                   <div className="flex justify-between items-center">
                     <span className="text-sm font-semibold text-gray-700">
+                      VACATION LEAVE:
+                    </span>
+                    <span className="text-xl font-black text-gray-900">
+                      {attendanceSummary.leave[0].leave_remaining}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-gray-700">
+                      SICK LEAVE:
+                    </span>
+                    <span className="text-xl font-black text-gray-900">
+                      {attendanceSummary.leave[1].leave_remaining}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-gray-700">
+                      {employeeInformation.gender === "Male"
+                        ? "PATERNITY"
+                        : "MATERNITY"}{" "}
                       LEAVE:
                     </span>
                     <span className="text-xl font-black text-gray-900">
-                      {attendanceSummary.leave}
+                      {attendanceSummary.leave[2].leave_remaining}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-sm font-semibold text-gray-700">
+                      EMERGENCY LEAVE:
+                    </span>
+                    <span className="text-xl font-black text-gray-900">
+                      {attendanceSummary.leave[3].leave_remaining}
                     </span>
                   </div>
                   <div className="flex justify-between items-center pt-4 border-t border-blue-200">
@@ -411,7 +437,10 @@ export default function EmployeeInformation({ employee, onClose }) {
                       LEAVE BALANCE:
                     </span>
                     <span className="text-xl font-black text-gray-900">
-                      {attendanceSummary.leaveBalance}
+                      {attendanceSummary.leave[0].leave_remaining +
+                        attendanceSummary.leave[1].leave_remaining +
+                        attendanceSummary.leave[2].leave_remaining +
+                        attendanceSummary.leave[3].leave_remaining}
                     </span>
                   </div>
                 </div>

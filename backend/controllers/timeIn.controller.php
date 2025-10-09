@@ -4,7 +4,7 @@
     function timeIn($employeeId, $rfid, $pdo){
 
         $query = "INSERT INTO time_and_attendance (employee_id, check_in_time, schedule_day, attendance_status)
-VALUES (:employee_id, CURTIME(), NOW(), 'Present')";
+VALUES (:employee_id, CURTIME(), NOW(), 'Present')"; // the 'Present' needs to be dynamic
 
         try {
             $stmt = $pdo->prepare($query);

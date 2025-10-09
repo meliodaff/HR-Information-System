@@ -119,10 +119,17 @@ const useGetAttendanceRecord = () => {
   const getAttendanceRecordForMonth = async (employeeId, month) => {
     try {
       setLoadingForGetAttendanceRecordForMonth(true);
-      const response = await axios.get(
+      const responseForAttendanceRecord = await axios.get(
         `/getAttendanceRecord.php?id=${employeeId}&month=${month}`
       );
-      return response.data;
+
+      const responseForAttendanceSummary = await axios.get(
+        `/getAttendanceRecord.php?attendanceSummary=true&id=${employeeId}`
+      );
+      return [
+        responseForAttendanceRecord.data,
+        responseForAttendanceSummary.data,
+      ];
     } catch (error) {
       if (error.status >= 400) {
         return {
