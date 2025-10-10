@@ -10,6 +10,32 @@ require_once __DIR__ . "/../utils/availableToCheckOut.php";
 require_once __DIR__ . "/../utils/checkIfEmployeeHasDuty.php";
 require_once __DIR__ . "/../utils/isDutyDone.php";
 
+require __DIR__ . '/../vendor/autoload.php'; // WebSocket client
+
+use WebSocket\Client;
+
+// Function to broadcast to WebSocket server
+function sendToWebSocket($data) {
+    try {
+        $client = new Client("ws://localhost:8080/rfid"); // Make sure ws-server.php is running
+        $client->send(json_encode($data));
+    } catch (\Exception $e) {
+        echo "⚠️ WebSocket error: " . $e->getMessage() . "\n";
+    }
+}
+
+function sendMessageToClient($client, $employeeId, $line, $fullName, $message, $type) {
+     $client->send(json_encode([
+                    "employee_id" => $employeeId,
+                    "rfid" => $line,
+                    "name" => $fullName,
+                    "message" => $message,
+                    "type" => $type,
+                    "timestamp" => date("Y-m-d H:i:s")
+                ]));
+}
+
+
 $fp = fopen($serialPort, "r");
 if (!$fp) {
     die("Error: Unable to open $serialPort");
@@ -17,90 +43,112 @@ if (!$fp) {
 
 date_default_timezone_set("Asia/Manila");
 
+$client = new Client("ws://localhost:8080/rfid"); // open once
+
 while (true) {
     $line = trim(fgets($fp));
     
-    if ($line) {
-        // Ignore the READY signal, only capture UID
-        if ($line !== "READY") {
-            // echo "UID: $line\n";
-            // echo "endpoint hit";
+    if ($line && $line !== "READY") {
+        $response = isRFIDExists($line, $pdo);
 
-            $response = isRFIDExists($line, $pdo);
+        echo "tapped\n";
 
-            
+        //  $client->send(json_encode([
+        //     "employee_id" => 1,
+        //     "rfid" => "myRFID",
+        //     "name" => "Jv Bialen",
+        //     "message" => "This is my Message",
+        //     "type" => "time in or time out",
+        //     "timestamp" => date("Y-m-d H:i:s")
+        // ]));
+        
+     
 
-            if(!$response["isExist"]){
-                echo "RFID is not registered\n";
-                continue;
-            }
+        // echo "sent\n";
+        // continue;
+        // echo "i shouldnt be displayed";
 
-            $employeeId = $response["employeeId"];
 
-          
-
-            // WALA PA VALIDATION IF MAY SCHEDULE BA TALAGA THIS DAY SI EMPLOYEE
-            // ps -- working on progress na -- done!
-            
-            $hasDuty = isEmployeeHasDuty($employeeId, $pdo);
-
-            if(!$hasDuty["hasDuty"]){
-                echo $hasDuty["message"] . "\n";
-                continue;
-            }
-
-            $isDutyDone = isDutyDone($employeeId, $pdo);
-
-            if($isDutyDone["isDone"]){
-                echo $isDutyDone["message"] . "\n";
-                continue;
-            }
-
-            // echo "RFID exists\n";
-            // echo "{$response["employeeId"]}\n";
-
-            $isTimeIn = checkIfTimeIn($employeeId, $pdo);
-
-            // WALA PA TIME GAP PARA SA MGA NAG T-TAP NG TIME IN (REASON: BAKA MAG TIME OUT KAGAD KUNG KAKA TIME IN LANG)
-            // i think fixed na rin to since para makapag time out si employee, the employee must render 4 hours first
-            
-            if($isTimeIn["isTimeIn"]){
-
-                $isAvailableToCheckOut = isAvailableToCheckOut($employeeId, $pdo);
-                 
-                if(!$isAvailableToCheckOut["isAvailable"]){
-                    echo "{$isAvailableToCheckOut["message"]}\n";
-                    continue;
-                } else {
-                    $responseFromTimeOutController = timeOut($employeeId, $line, $pdo);
-                    echo "{$responseFromTimeOutController["message"]}\n";
-                    continue;
-                }
-            }
-
-            if(date("H:i:s") >= '17:00:00') {
-                echo "Time in not available past 5 PM \n";
-                continue;
-            }
-
-            if(date("H:i:s") <= '07:00:00') {
-                echo "Time in not available until 7 AM \n";
-                continue;
-            }
-
-            // THIS ALSO NEEDS VALIDATION IF THE EMPLOYEE FORGOT TO TIME OUT
-            $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
-            echo "{$responseFromTimeInController["message"]}\n";
-
-            // HAS TO HANDLE TIME OUT DUPLICATION
-
-            // i can get the employee_Id in the $response["employeeId"];
-            
-            
+        if (!$response["isExist"]) {
+            echo "RFID is not registered\n";
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $response["message"], "time_in");
+            continue;
         }
+
+        $employeeId = $response["employeeId"];
+
+        $hasDuty = isEmployeeHasDuty($employeeId, $pdo);
+        if (!$hasDuty["hasDuty"]) {
+            echo $hasDuty["message"] . "\n";
+
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isDutyDone["message"], "time_in");
+
+            continue;
+        }
+
+        $isDutyDone = isDutyDone($employeeId, $pdo);
+        if ($isDutyDone["isDone"]) {
+            echo $isDutyDone["message"] . "\n";
+
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isDutyDone["message"], "time_out");
+            continue;
+        }
+
+        $isTimeIn = checkIfTimeIn($employeeId, $pdo);
+
+        if ($isTimeIn["isTimeIn"]) {
+            $isAvailableToCheckOut = isAvailableToCheckOut($employeeId, $pdo);
+            if (!$isAvailableToCheckOut["isAvailable"]) {
+                echo "{$isAvailableToCheckOut["message"]}\n";
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isAvailableToCheckOut["message"], "time_out");
+                continue;
+            } else {
+                $responseFromTimeOutController = timeOut($employeeId, $line, $pdo);
+                echo "{$responseFromTimeOutController["message"]}\n";
+
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeOutController["message"], "time_out");
+
+                continue;
+            }
+        }
+
+        // if (date("H:i:s") >= '17:00:00') {
+        //     echo "Time in not available past 5 PM \n";
+        //     continue;
+        // }
+
+        // if (date("H:i:s") <= '07:00:00') {
+        //     echo "Time in not available until 7 AM \n";
+        //     continue;
+        // }
+
+        $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
+        echo "{$responseFromTimeInController["message"]}\n";
+
+        // Broadcast time-in info to React via WebSocket
+        // sendToWebSocket([
+        //     "employee_id" => $employeeId,
+        //     "rfid" => $line,
+        //     "name" => $response["full_name"],
+        //     "message" => $responseFromTimeInController["message"],
+        //     "type" => "time_in",
+        //     "timestamp" => date("Y-m-d H:i:s")
+        // ]);
+   
+
+        sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeInController["message"], "time_in");
+
+        // $client->send(json_encode([
+        //     "employee_id" => 1,
+        //     "rfid" => "myRFID",
+        //     "name" => "Jv Bialen",
+        //     "message" => "This is my Message",
+        //     "type" => "time in or time out",
+        //     "timestamp" => date("Y-m-d H:i:s")
+        // ]));
     }
+
     flush();
 }
 
 fclose($fp);
-?>

@@ -22,7 +22,8 @@
              
             $response = [
                  "success" => true,
-                 "message" => "Successfully time out for the employee ID: {$employeeId}"
+                //  "message" => "Successfully time out for the employee ID: {$employeeId}"
+                 "message" => "Successfully time out"
                 ];
 
         } catch (PDOException $e) {

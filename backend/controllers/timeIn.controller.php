@@ -23,7 +23,7 @@ VALUES (:employee_id, CURTIME(), NOW(), 'Present')"; // the 'Present' needs to b
              
             $response = [
                  "success" => true,
-                 "message" => "Successfully time in for the employee ID: {$employeeId}"
+                 "message" => "Successfully time in"
                 ];
 
         } catch (PDOException $e) {

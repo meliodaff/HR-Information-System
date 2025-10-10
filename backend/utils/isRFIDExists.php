@@ -1,7 +1,7 @@
 <?php
 
 function isRFIDExists($rfid, $pdo){
-        $query = "SELECT COUNT(rfid) AS total, employee_id FROM employees WHERE rfid = :rfid";
+        $query = "SELECT CONCAT(first_name, ' ', last_name) AS full_name, COUNT(rfid) AS total, employee_id FROM employees WHERE rfid = :rfid";
         try {
             $stmt = $pdo->prepare($query);
             $stmt->execute([":rfid" => $rfid]);
@@ -11,6 +11,7 @@ function isRFIDExists($rfid, $pdo){
                 $response = [
                     "isExist" => true,
                     "message" => "The employee ID exists",
+                    "full_name" => $row["full_name"],
                     "employeeId" => $row["employee_id"]
                     
                 ];
