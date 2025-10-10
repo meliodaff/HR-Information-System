@@ -15,7 +15,7 @@ import EmployeeAnalytics from "./pages/EmployeeAnalytics";
 import EmployeeSchedule from "./pages/EmployeeSchedule";
 import LeaveRequest from "./pages/LeaveRequest";
 import EmployeeIncentives from "./pages/EmployeeIncentives";
-
+import LiveRFIDDisplay from "./pages/LiveRFIDDisplay";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -24,11 +24,12 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       {/* <JobOffer /> */}
       {/* <Applicant /> */}
       {/* <JobApplicationForm /> */}
-      <Employees />
+      {/* <Employees /> */}
       {/* <AdminAnalytics /> */}
       {/* <AdminSchedule /> employee schedule not done yet */}
       {/* <LeaveRequest /> */}
       {/* <EmployeeIncentives /> */}
+      <LiveRFIDDisplay />
     </BrowserRouter>
   </React.StrictMode>
 );
