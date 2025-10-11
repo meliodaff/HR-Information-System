@@ -18,7 +18,7 @@ function isRFIDExists($rfid, $pdo){
             }else {
                 $response = [
                     "isExist" => false,
-                    "message" => "The employee ID doesnt exist"
+                    "message" => "The RFID is not registered"
                 ];
             }
 

@@ -73,7 +73,7 @@ while (true) {
 
         if (!$response["isExist"]) {
             echo "RFID is not registered\n";
-            sendMessageToClient($client, $employeeId ?? "No ID", $line, $response["full_name"] ?? "No Name", $response["message"], "time_in");
+            sendMessageToClient($client, $employeeId ?? "No ID", " - ", $response["full_name"] ?? "No Name", $response["message"], "time_in");
             continue;
         }
 
