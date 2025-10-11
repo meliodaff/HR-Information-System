@@ -16,7 +16,7 @@ import EmployeeSchedule from "./pages/EmployeeSchedule";
 import LeaveRequest from "./pages/LeaveRequest";
 import EmployeeIncentives from "./pages/EmployeeIncentives";
 import LiveRFIDDisplay from "./pages/LiveRFIDDisplay";
-import Attendance from "./pages/Attendance";
+import LiveAttendance from "./pages/LiveAttendance";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -31,7 +31,7 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       {/* <LeaveRequest /> */}
       {/* <EmployeeIncentives /> */}
       {/* <LiveRFIDDisplay /> */}
-      <Attendance />
+      <LiveAttendance />
     </BrowserRouter>
   </React.StrictMode>
 );

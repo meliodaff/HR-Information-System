@@ -1,4 +1,4 @@
-* {
+/* * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
@@ -127,7 +127,6 @@ button:hover {
   border-radius: 20px;
 }
 
-/* Popup */
 .popup {
   display: none;
   position: fixed;
@@ -168,6 +167,7 @@ button:hover {
   background-color: #d3d3d3;
   border-radius: 50%;
   margin: 0 auto 25px;
+  object-fit: cover;
 }
 
 .popup-box h3 {
@@ -243,7 +243,6 @@ button:hover {
   }
 }
 
-/* --- 480px --- */
 @media (max-width: 480px) {
   .logo {
     flex-direction: column;
@@ -274,4 +273,4 @@ button:hover {
   .popup-box {
     width: 250px;
   }
-}
+} */

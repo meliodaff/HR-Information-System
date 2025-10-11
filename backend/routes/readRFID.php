@@ -9,6 +9,7 @@ require_once __DIR__ . "/../utils/checkIfTimeIn.php";
 require_once __DIR__ . "/../utils/availableToCheckOut.php";
 require_once __DIR__ . "/../utils/checkIfEmployeeHasDuty.php";
 require_once __DIR__ . "/../utils/isDutyDone.php";
+require_once __DIR__ . "/../utils/getPhoto.php";
 
 require __DIR__ . '/../vendor/autoload.php'; // WebSocket client
 
@@ -24,7 +25,7 @@ function sendToWebSocket($data) {
     }
 }
 
-function sendMessageToClient($client, $employeeId, $line, $fullName, $message, $type, $timeIn = null, $timeOut = null) {
+function sendMessageToClient($client, $employeeId, $line, $fullName, $message, $type, $timeIn = null, $timeOut = null, $photo = null) {
      $client->send(json_encode([
                     "employee_id" => $employeeId,
                     "rfid" => $line,
@@ -33,7 +34,8 @@ function sendMessageToClient($client, $employeeId, $line, $fullName, $message, $
                     "type" => $type,
                     "timeIn" => $timeIn,
                     "timeOut" => $timeOut,
-                    "timestamp" => date("Y-m-d H:i:s")
+                    "timestamp" => date("Y-m-d H:i:s"),
+                    "photo" => $photo
                 ]));
 }
 
@@ -52,7 +54,7 @@ while (true) {
     
     if ($line && $line !== "READY") {
         $response = isRFIDExists($line, $pdo);
-
+        echo $line . "\n";
         echo "tapped\n";
 
         //  $client->send(json_encode([
@@ -63,27 +65,31 @@ while (true) {
         //     "type" => "time in or time out",
         //     "timestamp" => date("Y-m-d H:i:s")
         // ]));
-        
-     
-
+            
         // echo "sent\n";
         // continue;
         // echo "i shouldnt be displayed";
-
-
+        
+        
         if (!$response["isExist"]) {
             echo "RFID is not registered\n";
-            sendMessageToClient($client, $employeeId ?? "No ID", " - ", $response["full_name"] ?? "No Name", $response["message"], "time_in");
+            sendMessageToClient($client, "No ID", " - ", $response["full_name"] ?? "No Name", $response["message"], "time_in", null, null);
             continue;
         }
-
+        
         $employeeId = $response["employeeId"];
+
+        $photo = getPhoto($employeeId, $pdo);
+        $photo = $photo["profile_image_url"];
+        echo "------------------------------------------------";
+        echo $photo;
+        echo "------------------------------------------------";
 
         $hasDuty = isEmployeeHasDuty($employeeId, $pdo);
         if (!$hasDuty["hasDuty"]) {
             // echo $hasDuty["message"] . "\n";
 
-            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $hasDuty["message"], "time_in");
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $hasDuty["message"], "time_in", null,  $photo);
 
             continue;
         }
@@ -92,7 +98,7 @@ while (true) {
         if ($isDutyDone["isDone"]) {
             echo $isDutyDone["message"] . "\n";
 
-                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isDutyDone["message"], "time_out", $isDutyDone["timeIn"], $isDutyDone["timeOut"],);
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isDutyDone["message"], "time_out", $isDutyDone["timeIn"], $isDutyDone["timeOut"], $photo);
             continue;
         }
 
@@ -102,13 +108,13 @@ while (true) {
             $isAvailableToCheckOut = isAvailableToCheckOut($employeeId, $pdo);
             if (!$isAvailableToCheckOut["isAvailable"]) {
                 echo "{$isAvailableToCheckOut["message"]}\n";
-                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isAvailableToCheckOut["message"], "time_out", $isAvailableToCheckOut["timeIn"]);
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isAvailableToCheckOut["message"], "time_out", $isAvailableToCheckOut["timeIn"], null,   $photo);
                 continue;
             } else {
                 $responseFromTimeOutController = timeOut($employeeId, $line, $pdo);
                 echo "{$responseFromTimeOutController["message"]}\n";
 
-                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeOutController["message"], "time_out");
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeOutController["message"], "time_out", $responseFromTimeOutController["timeIn"], date("h:i:s A"), $photo);
 
                 continue;
             }
@@ -137,9 +143,7 @@ while (true) {
         //     "timestamp" => date("Y-m-d H:i:s")
         // ]);
    
-
-        sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeInController["message"], "time_in");
-
+        sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeInController["message"], "time_in", date("h:i:s A"), $photo);
         // $client->send(json_encode([
         //     "employee_id" => 1,
         //     "rfid" => "myRFID",
