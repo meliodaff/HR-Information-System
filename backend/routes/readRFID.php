@@ -73,7 +73,7 @@ while (true) {
         
         if (!$response["isExist"]) {
             echo "RFID is not registered\n";
-            sendMessageToClient($client, "No ID", " - ", $response["full_name"] ?? "No Name", $response["message"], "time_in", null, null);
+            sendMessageToClient($client, "No ID", " - ", $response["full_name"] ?? "No Name", $response["message"], "time_in");
             continue;
         }
         
@@ -89,7 +89,7 @@ while (true) {
         if (!$hasDuty["hasDuty"]) {
             // echo $hasDuty["message"] . "\n";
 
-            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $hasDuty["message"], "time_in", null,  $photo);
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $hasDuty["message"], "time_in", null, null, $photo);
 
             continue;
         }
@@ -120,15 +120,17 @@ while (true) {
             }
         }
 
-        // if (date("H:i:s") >= '17:00:00') {
-        //     echo "Time in not available past 5 PM \n";
-        //     continue;
-        // }
-
-        // if (date("H:i:s") <= '07:00:00') {
-        //     echo "Time in not available until 7 AM \n";
-        //     continue;
-        // }
+        if (date("H:i:s") >= '17:00:00') {
+            echo "Time in not available past 5 PM \n";
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available past 5 PM", "time_in", null, null, $photo);
+            continue;
+        }
+        
+        if (date("H:i:s") <= '07:00:00') {
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available until 7 PM", "time_in", null, null, $photo);
+            echo "Time in not available until 7 AM \n";
+            continue;
+        }
 
         $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
         echo "{$responseFromTimeInController["message"]}\n";
@@ -143,7 +145,7 @@ while (true) {
         //     "timestamp" => date("Y-m-d H:i:s")
         // ]);
    
-        sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeInController["message"], "time_in", date("h:i:s A"), $photo);
+        sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeInController["message"], "time_in", date("h:i:s A"), null, $photo);
         // $client->send(json_encode([
         //     "employee_id" => 1,
         //     "rfid" => "myRFID",

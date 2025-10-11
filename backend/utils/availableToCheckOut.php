@@ -11,7 +11,7 @@ function isAvailableToCheckOut($employeeId, $pdo){
   COUNT(*) as total,
   attendance_id, 
   employee_id, 
-  check_in_time,
+ DATE_FORMAT(check_in_time, '%h:%i %p') AS check_in_time,
   TIMESTAMPDIFF(HOUR, check_in_time, NOW()) AS hours_worked,
   CASE 
     WHEN TIMESTAMPDIFF(HOUR, check_in_time, NOW()) >= 4 THEN 1
