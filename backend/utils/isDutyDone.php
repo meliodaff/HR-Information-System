@@ -1,7 +1,7 @@
 <?php
 
 function isDutyDone($employeeId, $pdo){
-        $query = "SELECT employee_id, COUNT(check_out_time) AS total FROM time_and_attendance WHERE employee_id = :employee_id AND DATE(check_in_time) = CURDATE()
+        $query = "SELECT employee_id, check_in_time, check_out_time, COUNT(check_out_time) AS total FROM time_and_attendance WHERE employee_id = :employee_id AND DATE(check_in_time) = CURDATE()
 ";
         try {
             $stmt = $pdo->prepare($query);
@@ -11,8 +11,10 @@ function isDutyDone($employeeId, $pdo){
             if($row && $row["total"] > 0) {
                 $response = [
                     "isDone" => true,
-                    "message" => "The employee ID {$employeeId} has already checked out for today's duty",
-                    "employeeId" => $row["employee_id"]
+                    "message" => "You have already checked out for today's duty",
+                    "employeeId" => $row["employee_id"],
+                    "timeIn" => $row["check_in_time"], 
+                    "timeOut" => $row["check_out_time"] 
                 ];
             }else {
                 $response = [

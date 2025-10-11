@@ -20,7 +20,7 @@ FROM employee_schedules WHERE employee_id = :employee_id AND day_of_week = DAYNA
             }else {
                 $response = [
                     "hasDuty" => false,
-                    "message" => "The employee ID: {$employeeId} has no duty today: " . date("l"),
+                    "message" => "You have no duty today: " . date("l"),
                 ];
             }
 

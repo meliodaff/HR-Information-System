@@ -24,13 +24,15 @@ function sendToWebSocket($data) {
     }
 }
 
-function sendMessageToClient($client, $employeeId, $line, $fullName, $message, $type) {
+function sendMessageToClient($client, $employeeId, $line, $fullName, $message, $type, $timeIn = null, $timeOut = null) {
      $client->send(json_encode([
                     "employee_id" => $employeeId,
                     "rfid" => $line,
                     "name" => $fullName,
                     "message" => $message,
                     "type" => $type,
+                    "timeIn" => $timeIn,
+                    "timeOut" => $timeOut,
                     "timestamp" => date("Y-m-d H:i:s")
                 ]));
 }
@@ -71,7 +73,7 @@ while (true) {
 
         if (!$response["isExist"]) {
             echo "RFID is not registered\n";
-            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $response["message"], "time_in");
+            sendMessageToClient($client, $employeeId ?? "No ID", $line, $response["full_name"] ?? "No Name", $response["message"], "time_in");
             continue;
         }
 
@@ -79,9 +81,9 @@ while (true) {
 
         $hasDuty = isEmployeeHasDuty($employeeId, $pdo);
         if (!$hasDuty["hasDuty"]) {
-            echo $hasDuty["message"] . "\n";
+            // echo $hasDuty["message"] . "\n";
 
-            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isDutyDone["message"], "time_in");
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], $hasDuty["message"], "time_in");
 
             continue;
         }
@@ -90,7 +92,7 @@ while (true) {
         if ($isDutyDone["isDone"]) {
             echo $isDutyDone["message"] . "\n";
 
-                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isDutyDone["message"], "time_out");
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isDutyDone["message"], "time_out", $isDutyDone["timeIn"], $isDutyDone["timeOut"],);
             continue;
         }
 
@@ -100,7 +102,7 @@ while (true) {
             $isAvailableToCheckOut = isAvailableToCheckOut($employeeId, $pdo);
             if (!$isAvailableToCheckOut["isAvailable"]) {
                 echo "{$isAvailableToCheckOut["message"]}\n";
-                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isAvailableToCheckOut["message"], "time_out");
+                sendMessageToClient($client, $employeeId, $line, $response["full_name"], $isAvailableToCheckOut["message"], "time_out", $isAvailableToCheckOut["timeIn"]);
                 continue;
             } else {
                 $responseFromTimeOutController = timeOut($employeeId, $line, $pdo);

@@ -16,6 +16,7 @@ import EmployeeSchedule from "./pages/EmployeeSchedule";
 import LeaveRequest from "./pages/LeaveRequest";
 import EmployeeIncentives from "./pages/EmployeeIncentives";
 import LiveRFIDDisplay from "./pages/LiveRFIDDisplay";
+import Attendance from "./pages/Attendance";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
@@ -29,7 +30,8 @@ ReactDOM.createRoot(document.getElementById("root")).render(
       {/* <AdminSchedule /> employee schedule not done yet */}
       {/* <LeaveRequest /> */}
       {/* <EmployeeIncentives /> */}
-      <LiveRFIDDisplay />
+      {/* <LiveRFIDDisplay /> */}
+      <Attendance />
     </BrowserRouter>
   </React.StrictMode>
 );
