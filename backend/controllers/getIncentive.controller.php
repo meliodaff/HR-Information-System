@@ -4,19 +4,19 @@
     
         $query = "SELECT
 e.employee_id,
- e.first_name,
- e.last_name,
- i.incentive_name,
- ia.bonus,
- MONTHNAME(ia.award_date) month_award,
- YEAR(ia.award_date) year_award,
- ia.is_claimed
+i.incentive_id,
+CONCAT(e.first_name, ' ', e.last_name) AS name,
+i.incentive_name,
+i.description,
+ia.notes,
+ia.bonus,
+ia.award_date,
+ia.is_claimed
 FROM incentive_awards ia
-JOIN incentives i
-ON ia.incentive_id = i.incentive_id
 JOIN employees e
-ON e.employee_id = ia.employee_id
-";
+ON ia.employee_id = e.employee_id
+JOIN incentives i
+ON ia.incentive_id = i.incentive_id";
         try {
             $stmt = $pdo->prepare($query);
             $stmt->execute();
@@ -38,18 +38,19 @@ ON e.employee_id = ia.employee_id
     function getIncentive($id, $pdo) {
         $query = "SELECT
 e.employee_id,
- e.first_name,
- e.last_name,
- i.incentive_name,
- ia.bonus,
- MONTHNAME(ia.award_date) month_award,
- YEAR(ia.award_date) year_award,
- ia.is_claimed
+i.incentive_id,
+CONCAT(e.first_name, ' ', e.last_name) AS name,
+i.incentive_name,
+i.description,
+ia.notes,
+ia.bonus,
+ia.award_date,
+ia.is_claimed
 FROM incentive_awards ia
+JOIN employees e
+ON ia.employee_id = e.employee_id
 JOIN incentives i
 ON ia.incentive_id = i.incentive_id
-JOIN employees e
-ON e.employee_id = ia.employee_id
 WHERE e.employee_id = :employee_id
 ";
 
