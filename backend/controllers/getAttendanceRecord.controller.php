@@ -137,15 +137,56 @@ ON e.employee_id = taa.employee_id
 WHERE e.employee_id = :employee_id AND MONTH(taa.check_in_time) = MONTH(CURDATE()) AND YEAR(taa.check_in_time) = YEAR(CURDATE()) 
 AND taa.attendance_status = 'Late'
 ";
-        $queryForAbsent = "SELECT
-e.employee_id,
-COUNT(taa.attendance_status) AS absent_count
-FROM employees e
-JOIN time_and_attendance taa
-ON e.employee_id = taa.employee_id
-WHERE e.employee_id = :employee_id AND MONTH(taa.check_in_time) = MONTH(CURDATE()) AND YEAR(taa.check_in_time) = YEAR(CURDATE()) 
-AND taa.attendance_status = 'Absent'
-";
+//         $queryForAbsent = "SELECT
+// e.employee_id,
+// COUNT(taa.attendance_status) AS absent_count
+// FROM employees e
+// JOIN time_and_attendance taa
+// ON e.employee_id = taa.employee_id
+// WHERE e.employee_id = :employee_id AND MONTH(taa.schedule_day) = MONTH(CURDATE()) AND YEAR(taa.schedule_day) = YEAR(CURDATE()) 
+// AND taa.attendance_status = 'Absent'
+// ";
+
+    $currentDate = date('Y-m-01');
+    $currentYear = date('Y');
+    $currentMonth = date('m');
+
+// -- Generate all days the employee SHOULD work in the current month
+        $queryForAbsent = "WITH ScheduledDays AS ( SELECT 
+s.employee_id,
+DATE_ADD('$currentDate', INTERVAL seq DAY) AS expectedworkdate,
+s.day_of_week
+FROM employee_schedules s
+CROSS JOIN (
+SELECT 0 AS seq UNION ALL SELECT 1 UNION ALL SELECT 2 UNION ALL SELECT 3 UNION ALL 
+SELECT 4 UNION ALL SELECT 5 UNION ALL SELECT 6 UNION ALL SELECT 7 UNION ALL 
+SELECT 8 UNION ALL SELECT 9 UNION ALL SELECT 10 UNION ALL SELECT 11 UNION ALL 
+SELECT 12 UNION ALL SELECT 13 UNION ALL SELECT 14 UNION ALL SELECT 15 UNION ALL 
+SELECT 16 UNION ALL SELECT 17 UNION ALL SELECT 18 UNION ALL SELECT 19 UNION ALL 
+SELECT 20 UNION ALL SELECT 21 UNION ALL SELECT 22 UNION ALL SELECT 23 UNION ALL 
+SELECT 24 UNION ALL SELECT 25 UNION ALL SELECT 26 UNION ALL SELECT 27 UNION ALL 
+SELECT 28 UNION ALL SELECT 29 UNION ALL SELECT 30
+) days
+WHERE DATE_ADD('$currentDate', INTERVAL seq DAY) <= LAST_DAY('$currentDate')
+AND DAYNAME(DATE_ADD('$currentDate', INTERVAL seq DAY)) = s.day_of_week
+AND s.employee_id = :employee_id
+)
+SELECT 
+sd.employee_id,
+CONCAT(e.first_name, ' ', e.last_name) AS name,
+COALESCE(SUM(CASE WHEN ta.schedule_day IS NULL THEN 1 ELSE 0 END), 0) AS misseddays,
+COALESCE(SUM(CASE WHEN ta.attendance_status = 'Absent' THEN 1 ELSE 0 END), 0) AS absentdays,
+COALESCE(SUM(CASE WHEN ta.schedule_day IS NULL THEN 1 ELSE 0 END), 0) + 
+COALESCE(SUM(CASE WHEN ta.attendance_status = 'Absent' THEN 1 ELSE 0 END), 0) AS absent_count
+FROM ScheduledDays sd
+LEFT JOIN time_and_attendance ta 
+ON sd.employee_id = ta.employee_id 
+AND sd.expectedworkdate = ta.schedule_day
+AND YEAR(ta.schedule_day) = $currentYear 
+AND MONTH(ta.schedule_day) = $currentMonth
+JOIN employees e 
+ON sd.employee_id = e.employee_id
+GROUP BY sd.employee_id, e.first_name, e.last_name";
 
         $queryForApprovedLeave = "SELECT COUNT(*) AS leave_count
 FROM leave_requests lr

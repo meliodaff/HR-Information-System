@@ -27,8 +27,8 @@ function sendToWebSocket($data) {
 
 function sendMessageToClient($client, $employeeId, $line, $fullName, $message, $type, $timeIn = null, $timeOut = null, $photo = null) {
      $client->send(json_encode([
-                    "employee_id" => $employeeId,
-                    "rfid" => $line,
+                    // "employee_id" => $employeeId,
+                    // "rfid" => $line,
                     "name" => $fullName,
                     "message" => $message,
                     "type" => $type,
@@ -127,7 +127,7 @@ while (true) {
         }
         
         if (date("H:i:s") <= '07:00:00') {
-            sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available until 7 PM", "time_in", null, null, $photo);
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available until 7 AM", "time_in", null, null, $photo);
             echo "Time in not available until 7 AM \n";
             continue;
         }
