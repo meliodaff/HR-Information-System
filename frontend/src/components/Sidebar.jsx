@@ -15,7 +15,7 @@ export default function Sidebar() {
   const [activeItem, setActiveItem] = useState("Applicant");
 
   const menuItems = [
-    { id: "Dashboard", label: "Dashboard", icon: Home, link: "" },
+    { id: "Dashboard", label: "Dashboard", icon: Home, link: "/dashboard" },
     {
       id: "Employee Profile",
       label: "Employee Profile",
@@ -29,7 +29,12 @@ export default function Sidebar() {
       icon: Calendar,
       link: "/admin-schedule",
     },
-    { id: "Incentives", label: "Incentives", icon: Gift, link: "" },
+    {
+      id: "Incentives",
+      label: "Incentives",
+      icon: Gift,
+      link: "/admin-incentives",
+    },
     {
       id: "Analytics",
       label: "Analytics",

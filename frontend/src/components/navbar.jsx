@@ -1,28 +1,32 @@
 import { useState } from "react";
 import Button from "./Button";
-
-const NavItem = ({ children, active = false }) => (
-  <button
-    className={`relative px-4 py-2 font-bold text-sm lg:text-base transition-all duration-300 group ${
-      active ? "text-blue-600" : "text-black hover:text-blue-600"
-    }`}
-  >
-    <span className="relative z-10">{children}</span>
-    <div className="absolute inset-0 bg-blue-50 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300 ease-out opacity-0 group-hover:opacity-100"></div>
-    <div className="absolute inset-0 bg-blue-100 rounded-full scale-0 group-hover:scale-110 transition-transform duration-500 ease-out opacity-0 group-hover:opacity-70"></div>
-  </button>
+import { Link } from "react-router-dom";
+const NavItem = ({ link, children, active = false }) => (
+  <Link to={link}>
+    <button
+      className={`relative px-4 py-2 font-bold text-sm lg:text-base transition-all duration-300 group ${
+        active ? "text-blue-600" : "text-black hover:text-blue-600"
+      }`}
+    >
+      <span className="relative z-10">{children}</span>
+      <div className="absolute inset-0 bg-blue-50 rounded-full scale-0 group-hover:scale-100 transition-transform duration-300 ease-out opacity-0 group-hover:opacity-100"></div>
+      <div className="absolute inset-0 bg-blue-100 rounded-full scale-0 group-hover:scale-110 transition-transform duration-500 ease-out opacity-0 group-hover:opacity-70"></div>
+    </button>
+  </Link>
 );
 
-const MobileNavItem = ({ children, active = false }) => (
-  <button
-    className={`w-full text-left px-4 py-2 font-bold text-base transition-colors duration-200 rounded-lg ${
-      active
-        ? "text-blue-600 bg-blue-50"
-        : "text-black hover:text-blue-600 hover:bg-gray-50"
-    }`}
-  >
-    {children}
-  </button>
+const MobileNavItem = ({ link, children, active = false }) => (
+  <Link to={link}>
+    <button
+      className={`w-full text-left px-4 py-2 font-bold text-base transition-colors duration-200 rounded-lg ${
+        active
+          ? "text-blue-600 bg-blue-50"
+          : "text-black hover:text-blue-600 hover:bg-gray-50"
+      }`}
+    >
+      {children}
+    </button>
+  </Link>
 );
 
 const navbar = () => {
@@ -46,9 +50,11 @@ const navbar = () => {
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-1">
-            <NavItem active>HOME</NavItem>
-            <NavItem>SCHEDULE</NavItem>
-            <NavItem>INCENTIVES</NavItem>
+            <NavItem active link="/">
+              Home
+            </NavItem>
+            <NavItem link="/employee-schedule">SCHEDULE</NavItem>
+            <NavItem link="/employee-incentives">INCENTIVES</NavItem>
             <NavItem>REPORT</NavItem>
           </div>
 
