@@ -1,7 +1,7 @@
 import React from "react";
 import Navbar from "../components/navbar";
 import Button from "../components/Button";
-
+import { Link } from "react-router-dom";
 export default function JobOffer() {
   return (
     <div className="min-h-screen bg-white">
@@ -64,7 +64,7 @@ export default function JobOffer() {
                   onClick={() => console.log("Apply Clicked")}
                   className="bg-blue-600 text-white hover:bg-blue-700"
                 >
-                  APPLY
+                  <Link to={"/job-application"}>APPLY</Link>
                 </Button>
               </div>
             </div>

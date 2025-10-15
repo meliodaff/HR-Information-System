@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import SuccessModal from "../components/modals/SucessModal";
 import Navbar from "../components/navbar";
 import useInsertJobApplicant from "../api/useInsertJobApplicant";
+import { useNavigate } from "react-router-dom";
 export default function JobApplicationForm() {
+  const navigate = useNavigate();
   const { insertJobApplicant, loadingForJobApplicant } =
     useInsertJobApplicant();
   const [formData, setFormData] = useState({
@@ -87,6 +89,9 @@ export default function JobApplicationForm() {
 
     setIsSubmitted(true);
 
+    setTimeout(() => {
+      navigate("/");
+    }, 2000);
     // Show success modal
   };
 

@@ -11,6 +11,7 @@ const ServicesSection = () => {
           image={groomer}
           title="Groomer"
           description="Provides pet grooming services like bathing, trimming, and styling."
+          link="job-offer"
         />
         <Card
           image={veterinarian}
