@@ -7,7 +7,7 @@
         $queryToGetTheTimeIn = "SELECT 
 attendance_id,
 employee_id,
-DATE_FORMAT(check_in_time, '%h:%i %p') AS check_in_time
+DATE_FORMAT(check_in_time, '%h:%i:%s %p') AS check_in_time
 FROM time_and_attendance
 WHERE employee_id = :employee_id
 AND check_out_time IS NULL

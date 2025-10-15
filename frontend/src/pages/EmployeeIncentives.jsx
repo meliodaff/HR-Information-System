@@ -10,6 +10,7 @@ export default function EmployeeIncentives({ employee }) {
   const [rewardsData, setRewardsData] = useState([]);
   const [achievementsCount, setAchievementsCount] = useState([]);
   const [attendancePercentage, setAttendancePercentage] = useState("");
+  const [employeeInformation, setEmployeeInformation] = useState({});
   const {
     getIncentives,
     loadingForGetIncentives,
@@ -33,9 +34,13 @@ export default function EmployeeIncentives({ employee }) {
         month: parseInt(month),
       };
 
-      console.log(JSON.stringify(data));
       const response = await getAttendancePercentage(data);
-      console.log(response.data);
+      console.log(response);
+      setEmployeeInformation(() => {
+        return {
+          name: response.data.name,
+        };
+      });
       setAttendancePercentage(response.data);
     };
 
@@ -217,7 +222,7 @@ export default function EmployeeIncentives({ employee }) {
               {/* Header Section */}
               <div className="bg-white rounded-xl p-6 mb-6 shadow-md">
                 <h2 className="text-xl font-black text-gray-900 mb-2">
-                  Hi! Doc. {employee?.name || "Sphene"}
+                  Hi! Doc. {employeeInformation?.name || "Sphene"}
                 </h2>
                 <p className="text-sm text-gray-600 mb-4">
                   here are your rewards

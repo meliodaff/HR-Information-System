@@ -52,7 +52,9 @@ export default function JobOffer() {
                   <p className="font-semibold italic text-gray-800 mb-2">
                     Requirements:
                   </p>
-                  <p className="text-gray-600">To be discussed upon application.</p>
+                  <p className="text-gray-600">
+                    To be discussed upon application.
+                  </p>
                 </div>
               </div>
 

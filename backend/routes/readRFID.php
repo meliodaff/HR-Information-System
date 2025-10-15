@@ -10,6 +10,7 @@ require_once __DIR__ . "/../utils/availableToCheckOut.php";
 require_once __DIR__ . "/../utils/checkIfEmployeeHasDuty.php";
 require_once __DIR__ . "/../utils/isDutyDone.php";
 require_once __DIR__ . "/../utils/getPhoto.php";
+require_once __DIR__ . "/../utils/isForgotToTimeOut.php";
 
 require __DIR__ . '/../vendor/autoload.php'; // WebSocket client
 
@@ -120,9 +121,20 @@ while (true) {
             }
         }
 
-        if (date("H:i:s") >= '17:00:00') {
-            echo "Time in not available past 5 PM \n";
-            sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available past 5 PM", "time_in", null, null, $photo);
+       
+
+        $responseFromIsForgotToTimeOut = isForgotToTimeOut($employeeId, $pdo);
+
+        if($responseFromIsForgotToTimeOut["isForgotToTimeOut"]){
+            // sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromIsForgotToTimeOut["message"], "time_in", $responseFromIsForgotToTimeOut["timeIn"], null, $photo);
+            // continue;
+            $messageFromIsForgotToTimeOut = $responseFromIsForgotToTimeOut["message"];
+        }
+
+
+         if (date("H:i:s") >= '13:00:00') {
+            echo "Time in not available past 1 PM \n";
+            sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available past 1 PM", "time_in", null, null, $photo);
             continue;
         }
         
@@ -134,6 +146,8 @@ while (true) {
 
         $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
         echo "{$responseFromTimeInController["message"]}\n";
+        
+        sendMessageToClient($client, $employeeId, $line, $response["full_name"], ($messageFromIsForgotToTimeOut ?? " ") . " <br/>" . $responseFromTimeInController["message"], "time_in", date("h:i:s A"), null, $photo);
 
         // Broadcast time-in info to React via WebSocket
         // sendToWebSocket([
@@ -145,7 +159,6 @@ while (true) {
         //     "timestamp" => date("Y-m-d H:i:s")
         // ]);
    
-        sendMessageToClient($client, $employeeId, $line, $response["full_name"], $responseFromTimeInController["message"], "time_in", date("h:i:s A"), null, $photo);
         // $client->send(json_encode([
         //     "employee_id" => 1,
         //     "rfid" => "myRFID",
