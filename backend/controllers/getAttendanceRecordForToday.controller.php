@@ -11,8 +11,8 @@
     es.day_of_week,
     es.start_time AS scheduled_start,
     es.end_time AS scheduled_end,
-    taa.check_in_time,
-    taa.check_out_time,
+    TIME(taa.check_in_time) AS check_in_time,
+    TIME(taa.check_out_time) as check__out_time,
     taa.attendance_status,
     taa.notes
 FROM employees e
@@ -54,8 +54,8 @@ ORDER BY e.employee_id;
     es.day_of_week,
     es.start_time AS scheduled_start,
     es.end_time AS scheduled_end,
-    taa.check_in_time,
-    taa.check_out_time,
+    TIME(taa.check_in_time) AS check_in_time,
+    TIME(taa.check_out_time) AS check_out_time,
     taa.attendance_status,
     taa.notes
 FROM employees e

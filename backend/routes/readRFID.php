@@ -132,11 +132,11 @@ while (true) {
         }
 
 
-         if (date("H:i:s") >= '13:00:00') {
-            echo "Time in not available past 1 PM \n";
-            sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available past 1 PM", "time_in", null, null, $photo);
-            continue;
-        }
+        //  if (date("H:i:s") >= '13:00:00') {
+        //     echo "Time in not available past 1 PM \n";
+        //     sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available past 1 PM", "time_in", null, null, $photo);
+        //     continue;
+        // }
         
         if (date("H:i:s") <= '07:00:00') {
             sendMessageToClient($client, $employeeId, $line, $response["full_name"], "Time in not available until 7 AM", "time_in", null, null, $photo);

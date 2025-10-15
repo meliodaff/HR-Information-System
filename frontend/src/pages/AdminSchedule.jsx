@@ -49,9 +49,9 @@ export default function AttendanceSchedule() {
         position: data.position,
         timeIn: data.check_in_time,
         timeOut: data.check_out_time,
-        remarks: data.attendance_status,
+        remarks: data.attendance_status ? data.attendance_status : "Absent",
       }));
-
+      console.log(normalizedData);
       setAttendanceData(normalizedData);
     };
 
@@ -302,6 +302,8 @@ export default function AttendanceSchedule() {
                             className={`px-2 sm:px-4 py-2 sm:py-3 ${
                               record.remarks === "Present"
                                 ? "text-green-600"
+                                : record.remarks === null
+                                ? "text-red-600"
                                 : "text-red-600"
                             } font-semibold`}
                           >

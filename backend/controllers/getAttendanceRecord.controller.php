@@ -2,21 +2,27 @@
 
      function getAttendanceRecords($date, $pdo) {
     
-        $query = "SELECT
-e.employee_id,
-e.first_name,
-e.last_name,
-e.department,
-e.position,
-taa.schedule_day,
-taa.check_in_time,
-taa.check_out_time,
-taa.attendance_status,
-taa.notes
+        $query = "SELECT 
+    e.employee_id,
+    e.first_name,
+    e.last_name,
+    e.department,
+    e.position,
+    es.day_of_week,
+    es.start_time AS scheduled_start,
+    es.end_time AS scheduled_end,
+    TIME(taa.check_in_time) AS check_in_time,
+    TIME(taa.check_out_time) AS check_out_time,
+    taa.attendance_status,
+    taa.notes
 FROM employees e
-JOIN time_and_attendance taa
-ON e.employee_id = taa.employee_id
-WHERE DATE(check_in_time) = :date
+JOIN employee_schedules es
+    ON e.employee_id = es.employee_id
+    AND es.day_of_week = DAYNAME(:date)  -- get day name from parameter
+LEFT JOIN time_and_attendance taa
+    ON e.employee_id = taa.employee_id
+    AND DATE(taa.check_in_time) = :date  -- match the parameter date
+ORDER BY e.employee_id;
 ";
         try {
             $stmt = $pdo->prepare($query);

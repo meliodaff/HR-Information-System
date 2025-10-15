@@ -471,9 +471,11 @@ export default function EmployeeSchedule({ employee }) {
                 <h1 className="text-2xl sm:text-3xl font-black text-gray-900">
                   MY SCHEDULE
                 </h1>
-                <button className="mt-4 sm:mt-0 px-6 py-2 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
-                  <Link to="/leave-request">Request Leave</Link>
-                </button>
+                <Link to="/leave-request">
+                  <button className="mt-4 sm:mt-0 px-6 py-2 bg-white border-2 border-gray-300 rounded-lg font-semibold text-sm hover:bg-gray-50 transition-colors">
+                    Request Leave
+                  </button>
+                </Link>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
