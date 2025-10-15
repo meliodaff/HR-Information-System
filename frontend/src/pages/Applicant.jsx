@@ -2,6 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { MoreVertical, Search } from "lucide-react";
 import DashboardLayout from "../components/layouts/DashboardLayout";
 import useGetJobApplicants from "../api/useGetApplicant";
+import useUpdateApplicantStatus from "../api/useUpdateApplicantStatus";
 
 export default function ApplicantsTable() {
   const [activeMenuId, setActiveMenuId] = useState(null);
@@ -10,6 +11,8 @@ export default function ApplicantsTable() {
   const [statusFilter, setStatusFilter] = useState("all");
   const [dateSort, setDateSort] = useState("none");
   const { getJobApplicants, loadingForGetJobApplicant } = useGetJobApplicants();
+  const { updateApplicantStatus, loadingForUpdateApplicantStatus } =
+    useUpdateApplicantStatus();
   useEffect(() => {
     const useGetJobApplicantsFunc = async () => {
       const response = await getJobApplicants();
@@ -51,10 +54,20 @@ export default function ApplicantsTable() {
   };
 
   // Update applicant status by id
-  const updateStatusById = (id, newStatus) => {
+  const updateStatusById = async (id, newStatus) => {
     setApplicants((prev) =>
       prev.map((a) => (a.id === id ? { ...a, status: newStatus } : a))
     );
+
+    const response = await updateApplicantStatus({ id, newStatus });
+
+    console.log(response);
+    if (!response.success) {
+      alert(response.message);
+      return;
+    }
+
+    alert(response.message);
     setActiveMenuId(null);
   };
 

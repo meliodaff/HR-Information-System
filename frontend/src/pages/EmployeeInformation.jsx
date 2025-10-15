@@ -24,6 +24,7 @@ export default function EmployeeInformation({ employee, onClose }) {
         alert(response.message);
         return;
       }
+      console.log(response.data);
       const record = response.data[0];
       const schedule = response.data[1];
       const formattedData = {
@@ -37,7 +38,9 @@ export default function EmployeeInformation({ employee, onClose }) {
         // schedule: record.schedule || null,
         gender: record.gender,
         schedule: schedule.schedule_type,
+        photo: record.profile_image_url,
       };
+      console.log(formattedData);
       setEmployeeInformation(formattedData);
     };
 
@@ -51,6 +54,7 @@ export default function EmployeeInformation({ employee, onClose }) {
         employee.id,
         currentMonth
       );
+      console.log(response);
       if (!response[0].success) {
         alert(response[0].message);
         return;
@@ -67,7 +71,7 @@ export default function EmployeeInformation({ employee, onClose }) {
         timeOut: record.check_out_time,
         remarks: record.attendance_status,
       }));
-
+      console.log(response);
       const attendanceSummary = response[1].data;
 
       const formattedAttendanceSummary = {
@@ -132,7 +136,7 @@ export default function EmployeeInformation({ employee, onClose }) {
               <div className="relative">
                 <div className="w-24 h-24 sm:w-32 sm:h-32 bg-blue-100 rounded-xl overflow-hidden">
                   <img
-                    src="src/assets/images/profile.jpg"
+                    src={`http://localhost/hr-information-system/backend/${employeeInformation.photo}`}
                     alt={employee?.name || "Employee"}
                     className="w-full h-full object-cover"
                   />
@@ -417,7 +421,7 @@ export default function EmployeeInformation({ employee, onClose }) {
                     <span className="text-sm font-semibold text-gray-700">
                       {employeeInformation.gender === "Male"
                         ? "PATERNITY"
-                        : "MATERNITY"}
+                        : "MATERNITY"}{" "}
                       LEAVE:
                     </span>
                     <span className="text-xl font-black text-gray-900">

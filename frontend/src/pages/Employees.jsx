@@ -23,8 +23,9 @@ export default function Employees() {
         name: record.first_name + " " + record.last_name,
         position: record.Position,
         email: record.contact_email,
+        photo: record.profile_image_url,
       }));
-
+      console.log(formattedData);
       setEmployees(formattedData);
     };
 

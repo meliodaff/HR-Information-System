@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from "react";
 
 const Attendance = () => {
   const [rfidData, setRfidData] = useState({
-    employee_id: "",
     name: "",
     timestamp: "",
     timeIn: " - ",
@@ -241,7 +240,6 @@ const Attendance = () => {
     const form = e.target;
     const formData = {
       name: form.empName.value,
-      id: form.empID.value,
       message: form.empMessage?.value || "",
       date: form.date.value,
       timeIn: form.timeIn.value,
@@ -376,21 +374,6 @@ const Attendance = () => {
           <form className="attend_form" onSubmit={handleSubmit}>
             <input
               type="text"
-              id="empID"
-              name="empID"
-              placeholder="Employee ID"
-              required
-              value={rfidData ? rfidData.employee_id : ""}
-              onChange={(e) =>
-                setRfidData((prev) => ({
-                  ...prev,
-                  employee_id: e.target.value,
-                }))
-              }
-              style={styles.input}
-            />
-            <input
-              type="text"
               id="empName"
               name="empName"
               placeholder="Employee Name"
@@ -492,12 +475,8 @@ const Attendance = () => {
                 fontSize: "18px",
                 marginBottom: "15px",
               }}
-            >
-              {popupData.message}
-            </p>
-            <p style={styles.popupBoxP}>
-              <strong>ID:</strong> <span>{popupData.id}</span>
-            </p>
+              dangerouslySetInnerHTML={{ __html: popupData.message }}
+            ></p>
             <p style={styles.popupBoxP}>
               <strong>Date:</strong> <span>{popupData.date}</span>
             </p>

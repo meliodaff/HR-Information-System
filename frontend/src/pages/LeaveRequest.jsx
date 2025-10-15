@@ -2,7 +2,10 @@ import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import LeaveRequestModal from "../components/modals/LeaveRequestModal";
 import useInsertLeaveRequest from "../api/useInsertLeaveRequest";
+import { useNavigate } from "react-router-dom";
+
 export default function LeaveRequest() {
+  const navigate = useNavigate();
   const {
     responseForLeaveRequest,
     insertLeaveRequest,
@@ -184,6 +187,7 @@ export default function LeaveRequest() {
         document: null,
       });
       setIsSubmitted(false);
+      navigate("/employee-schedule");
       setErrors({});
     }
   };
