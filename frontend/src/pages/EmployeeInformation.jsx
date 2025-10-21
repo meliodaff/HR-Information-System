@@ -20,6 +20,7 @@ export default function EmployeeInformation({ employee, onClose }) {
   useEffect(() => {
     const useGetEmployeeFunc = async () => {
       const response = await getEmployee(employee.id);
+      console.log(response);
       if (!response.success) {
         alert(response.message);
         return;
@@ -37,7 +38,7 @@ export default function EmployeeInformation({ employee, onClose }) {
         employmentType: record.employment_type,
         // schedule: record.schedule || null,
         gender: record.gender,
-        schedule: schedule.schedule_type,
+        schedule: schedule.schedule_pattern,
         photo: record.profile_image_url,
       };
       console.log(formattedData);

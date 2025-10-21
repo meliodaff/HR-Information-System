@@ -12,7 +12,7 @@
     es.start_time AS scheduled_start,
     es.end_time AS scheduled_end,
     TIME(taa.check_in_time) AS check_in_time,
-    TIME(taa.check_out_time) as check__out_time,
+    TIME(taa.check_out_time) as check_out_time,
     taa.attendance_status,
     taa.notes
 FROM employees e

@@ -11,11 +11,15 @@ $REQUEST_METHOD = $_SERVER["REQUEST_METHOD"];
 
 if($REQUEST_METHOD === "GET"){
     $idParams = isset($_GET["id"]) ? $_GET["id"] : null;
-    if(!$idParams) {
+    $isClaim = isset($_GET["isClaim"]) ? $_GET["isClaim"] : null;
 
-        $response = getIncentives($pdo);
-    } else {
+    if($idParams) {
         $response = getIncentive($idParams, $pdo);
+    } 
+    else if ($isClaim === "0" || $isClaim === "1") {
+        $response = getIncentives((int)$isClaim, $pdo);
+    } else {
+        $response = getAllIncentivesForTheMonth($pdo);
     }
 
 

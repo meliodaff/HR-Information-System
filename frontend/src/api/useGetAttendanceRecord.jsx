@@ -22,6 +22,11 @@ const useGetAttendanceRecord = () => {
     setLoadingForGetAttendanceRecordForMonth,
   ] = useState(false);
 
+  const [
+    loadingForGetOverAllAttendancePerMonth,
+    setLoadingForGetOverAllAttendancePerMonth,
+  ] = useState(false);
+
   const getAttendanceRecords = async (date) => {
     const newDate = new Date(date).toISOString().split("T")[0];
     console.log(newDate);
@@ -146,6 +151,29 @@ const useGetAttendanceRecord = () => {
     }
   };
 
+  const getOverAllAttendancePerMonth = async () => {
+    try {
+      setLoadingForGetOverAllAttendancePerMonth(true);
+      const response = await axios.get(
+        `/getAttendanceRecord.php?overAllAttendance=true`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.status >= 400) {
+        return {
+          success: false,
+          message: error.response.data.message,
+        };
+      }
+      return {
+        success: false,
+        message: "API calling failed",
+      };
+    } finally {
+      setLoadingForGetOverAllAttendancePerMonth(false);
+    }
+  };
+
   return {
     getAttendanceRecords,
     loadingForGetAttendanceRecords,
@@ -157,6 +185,8 @@ const useGetAttendanceRecord = () => {
     loadingForGetAttendanceRecord,
     loadingForGetAttendanceRecordForMonth,
     getAttendanceRecordForMonth,
+    getOverAllAttendancePerMonth,
+    loadingForGetOverAllAttendancePerMonth,
   };
 };
 

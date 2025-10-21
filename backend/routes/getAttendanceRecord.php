@@ -11,10 +11,13 @@ $REQUEST_METHOD = $_SERVER["REQUEST_METHOD"];
 
 
 if($REQUEST_METHOD === "GET"){
+
     $idParams = isset($_GET["id"]) ? (int)$_GET["id"] : null;
     $date = isset($_GET["date"]) ? $_GET["date"] : null;
     $month = isset($_GET["month"]) ? $_GET["month"] : null;
     $attendanceSummary = isset($_GET["attendanceSummary"]) ? $_GET["attendanceSummary"] : null;
+    $overAllAttendance = isset($_GET["overAllAttendance"]) ? $_GET["overAllAttendance"] : null;
+
     if($idParams && $date) {
         $response = getAttendanceRecord($idParams, $date, $pdo);
     }
@@ -30,6 +33,9 @@ if($REQUEST_METHOD === "GET"){
     } else if($date) {
         $response = getAttendanceRecords($date, $pdo);
     } 
+    else if ($overAllAttendance === "true") {
+        $response = getOverAllAttendancePerMonth($pdo);
+    }
     else {
         // employees attendance record for today
         $response = getAttendanceRecordsForToday($pdo);

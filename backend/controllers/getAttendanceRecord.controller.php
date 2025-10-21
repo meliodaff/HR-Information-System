@@ -274,4 +274,81 @@ ORDER BY lt.leave_type_id ASC
             return $response;
     }
 
+
+
+    function getAllAttendanceRecord($pdo) {
+    
+        $query = "SELECT * FROM time_and_attendance
+";
+        try {
+            $stmt = $pdo->prepare($query);
+            $stmt->execute();
+
+            $datas = $stmt->fetchAll();
+            $response = [
+                "success" => true,
+                "data" => $datas 
+            ];
+        } catch (PDOException $e) {
+            $response = [
+                "success" => false,
+                "error" => $e->getMessage()
+            ];
+            }
+            return $response;
+    }
+
+    function getOverAllAttendancePerMonth($pdo) {
+    
+//         $query = "SELECT 
+//     ROUND(
+//         (SUM(CASE 
+//             WHEN attendance_status IN ('Present', 'Late', 'On Leave') THEN 1 
+//             ELSE 0 
+//         END) / COUNT(*)) * 100, 
+//     2) AS overall_attendance_percentage
+// FROM time_and_attendance
+// WHERE MONTH(schedule_day) = MONTH(CURDATE())
+// AND YEAR(schedule_day) = YEAR(CURDATE());
+// ";
+
+        $query = "SELECT 
+    DATE_FORMAT(schedule_day, '%Y-%m') AS month,
+    COUNT(*) AS total_records,
+    SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) AS absent_count,
+    SUM(CASE WHEN attendance_status = 'Late' THEN 1 ELSE 0 END) AS late_count,
+    COUNT(*) - SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END) - SUM(CASE WHEN attendance_status = 'Late' THEN 1 ELSE 0 END) AS present_count,
+    ROUND(
+        ((COUNT(*) - SUM(CASE WHEN attendance_status = 'Absent' THEN 1 ELSE 0 END)) / COUNT(*)) * 100, 
+        2
+    ) AS overall_attendance_percentage
+FROM 
+    time_and_attendance
+WHERE 
+    DATE_FORMAT(schedule_day, '%Y-%m') = DATE_FORMAT(CURDATE(), '%Y-%m')
+GROUP BY 
+    DATE_FORMAT(schedule_day, '%Y-%m');
+";
+        try {
+            $stmt = $pdo->prepare($query);
+            $stmt->execute();
+
+            $datas = $stmt->fetch();
+            $response = [
+                "success" => true,
+                "data" => $datas 
+            ];
+        } catch (PDOException $e) {
+            $response = [
+                "success" => false,
+                "error" => $e->getMessage()
+            ];
+            }
+            return $response;
+    }
+
+
+
+    
+
 ?>
