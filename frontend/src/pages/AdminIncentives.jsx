@@ -7,7 +7,8 @@ import useGetAttendanceRecord from "../api/useGetAttendanceRecord";
 export default function AdminIncentives() {
   const [activeTab, setActiveTab] = useState("request");
   const [activeMenu, setActiveMenu] = useState(null);
-  const { getIncentives, getAllIncentivesForTheMonth } = useGetIncentive();
+  const { getIncentives, getAllIncentivesForTheMonth, getTopPerformer } =
+    useGetIncentive();
   const { getOverAllAttendancePerMonth } = useGetAttendanceRecord();
 
   const [claimRequests, setClaimRequests] = useState([]);
@@ -115,13 +116,37 @@ export default function AdminIncentives() {
     useGetAllIncentivesForTheMonthFunc();
   }, []);
 
-  const leaderboard = [
-    { date: "1", name: "NAME", reward: "REWARD EARNED" },
-    { date: "2", name: "NAME", reward: "REWARD EARNED" },
-    { date: "3", name: "NAME", reward: "REWARD EARNED" },
-    { date: "4", name: "NAME", reward: "REWARD EARNED" },
-    { date: "5", name: "NAME", reward: "REWARD EARNED" },
-  ];
+  const [leaderboard, setLeaderboard] = useState([]);
+
+  useEffect(() => {
+    const useGetTopPerformerFunc = async () => {
+      const response = await getTopPerformer();
+      console.log(response.data);
+
+      if (!response.success) {
+        alert(response.message);
+        return;
+      }
+
+      const formattedData = response.data.map((data) => ({
+        name: data.first_name + " " + data.last_name,
+        averageReviewScore: data.avg_review_score || " - ",
+        totalHours: data.total_hours,
+        performanceScore: data.performance_score,
+      }));
+
+      setLeaderboard(formattedData);
+    };
+    useGetTopPerformerFunc();
+  }, []);
+
+  // const leaderboard = [
+  //   { date: "1", name: "NAME", reward: "REWARD EARNED" },
+  //   { date: "2", name: "NAME", reward: "REWARD EARNED" },
+  //   { date: "3", name: "NAME", reward: "REWARD EARNED" },
+  //   { date: "4", name: "NAME", reward: "REWARD EARNED" },
+  //   { date: "5", name: "NAME", reward: "REWARD EARNED" },
+  // ];
 
   const menuOptions = ["Pending Approval", "Approved", "Rejected"];
 
@@ -233,13 +258,16 @@ export default function AdminIncentives() {
                   <thead className="border-b-2 border-gray-200">
                     <tr>
                       <th className="px-2 sm:px-4 py-2 text-left font-black text-gray-900 uppercase">
-                        Date
-                      </th>
-                      <th className="px-2 sm:px-4 py-2 text-left font-black text-gray-900 uppercase">
                         Name
                       </th>
                       <th className="px-2 sm:px-4 py-2 text-left font-black text-gray-900 uppercase">
-                        Reward Earned
+                        Avg Review Score
+                      </th>
+                      <th className="px-2 sm:px-4 py-2 text-left font-black text-gray-900 uppercase">
+                        Total Hours
+                      </th>
+                      <th className="px-2 sm:px-4 py-2 text-left font-black text-gray-900 uppercase">
+                        Performance Score
                       </th>
                     </tr>
                   </thead>
@@ -247,13 +275,16 @@ export default function AdminIncentives() {
                     {leaderboard.map((item, index) => (
                       <tr key={index} className="hover:bg-gray-50">
                         <td className="px-2 sm:px-4 py-3 text-gray-900">
-                          {item.date}
-                        </td>
-                        <td className="px-2 sm:px-4 py-3 text-gray-900">
                           {item.name}
                         </td>
                         <td className="px-2 sm:px-4 py-3 text-gray-900">
-                          {item.reward}
+                          {item.averageReviewScore}
+                        </td>
+                        <td className="px-2 sm:px-4 py-3 text-gray-900">
+                          {item.totalHours}
+                        </td>
+                        <td className="px-2 sm:px-4 py-3 text-gray-900">
+                          {item.performanceScore}
                         </td>
                       </tr>
                     ))}

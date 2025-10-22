@@ -8,6 +8,8 @@ const useGetIncentive = () => {
     loadingForGetAllIncentiveForTheMonth,
     setLoadingForGetAllIncentiveForTheMonth,
   ] = useState(false);
+  const [loadingForGetTopPerformer, setLoadingForGetTopPerformer] =
+    useState(false);
 
   const getIncentives = async (isClaim) => {
     try {
@@ -72,6 +74,27 @@ const useGetIncentive = () => {
     }
   };
 
+  const getTopPerformer = async () => {
+    try {
+      setLoadingForGetTopPerformer(true);
+      const response = await axios.get(`/getIncentive.php?topPerformer=true`);
+      return response.data;
+    } catch (error) {
+      if (error.status >= 400) {
+        return {
+          success: false,
+          message: error.response.data.message,
+        };
+      }
+      return {
+        success: false,
+        message: "API calling failed",
+      };
+    } finally {
+      setLoadingForGetTopPerformer(false);
+    }
+  };
+
   return {
     getIncentives,
     loadingForGetIncentives,
@@ -79,6 +102,8 @@ const useGetIncentive = () => {
     loadingForGetIncentive,
     getAllIncentivesForTheMonth,
     loadingForGetAllIncentiveForTheMonth,
+    getTopPerformer,
+    loadingForGetTopPerformer,
   };
 };
 

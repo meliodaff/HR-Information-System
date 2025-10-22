@@ -11,6 +11,7 @@ export default function EmployeeIncentives({ employee }) {
   const [achievementsCount, setAchievementsCount] = useState([]);
   const [attendancePercentage, setAttendancePercentage] = useState("");
   const [employeeInformation, setEmployeeInformation] = useState({});
+  const [employeeName, setEmployeeName] = useState(null);
   const {
     getIncentives,
     loadingForGetIncentives,
@@ -28,7 +29,7 @@ export default function EmployeeIncentives({ employee }) {
       const month = String(today.getMonth() + 1).padStart(2, "0");
 
       const data = {
-        id: 1,
+        id: 2,
         date: `${year}-${month}-01`,
         year: year,
         month: parseInt(month),
@@ -49,7 +50,7 @@ export default function EmployeeIncentives({ employee }) {
 
   useEffect(() => {
     const useGetIncentivesFunc = async () => {
-      const response = await getIncentive(1);
+      const response = await getIncentive(2);
       console.log(response);
       if (!response.success) {
         alert(response.message);
@@ -235,7 +236,9 @@ export default function EmployeeIncentives({ employee }) {
                     <span className="font-bold">
                       {attendancePercentage.days_attended_percentage}%
                     </span>{" "}
-                    perfect attendance this month
+                    {+attendancePercentage.days_attended_percentage >= 100
+                      ? "perfect attendance this month"
+                      : "towards perfect attendance this month"}
                   </p>
                 </div>
 
