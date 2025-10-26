@@ -55,7 +55,7 @@ const navbar = () => {
             </NavItem>
             <NavItem link="/employee-schedule">SCHEDULE</NavItem>
             <NavItem link="/employee-incentives">INCENTIVES</NavItem>
-            <NavItem>REPORT</NavItem>
+            <NavItem link="/employee-analytics">ANALYTICS</NavItem>
           </div>
 
           {/* Login Button */}

@@ -148,5 +148,173 @@ FROM employee_weekly_hours;";
             return $response;
     }
 
+    function getAttendanceAnalyticsByEmployeeId($id, $pdo) {
+    
+        $query = "WITH attendance_summary AS (
+    SELECT 
+        t.employee_id,
+        DATE_FORMAT(t.schedule_day, '%Y-%m') as month,
+        MONTHNAME(t.schedule_day) as month_name,
+        YEAR(t.schedule_day) as year,
+        COUNT(*) as total_scheduled_days,
+        SUM(CASE WHEN t.attendance_status = 'Present' THEN 1 ELSE 0 END) as present_days,
+        SUM(CASE WHEN t.attendance_status = 'Late' THEN 1 ELSE 0 END) as late_days,
+        SUM(CASE WHEN t.attendance_status = 'Absent' THEN 1 ELSE 0 END) as absent_days
+    FROM time_and_attendance t
+    INNER JOIN employee_schedules es 
+        ON t.employee_id = es.employee_id
+        AND DAYNAME(t.schedule_day) = es.day_of_week
+    WHERE YEAR(t.schedule_day) = YEAR(CURDATE())
+      AND MONTH(t.schedule_day) = MONTH(CURDATE())
+    GROUP BY t.employee_id, DATE_FORMAT(t.schedule_day, '%Y-%m')
+)
+SELECT 
+    employee_id,
+    year,
+    month_name,
+    month,
+    total_scheduled_days,
+    present_days,
+    late_days,
+    absent_days,
+    ROUND((present_days * 100.0 / total_scheduled_days), 2) as present_percentage,
+    ROUND((late_days * 100.0 / total_scheduled_days), 2) as late_percentage,
+    ROUND((absent_days * 100.0 / total_scheduled_days), 2) as absent_percentage
+FROM attendance_summary
+WHERE employee_id = :employee_id
+ORDER BY employee_id";
+        try {
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([
+                ":employee_id" => $id
+            ]);
+
+            $datas = $stmt->fetch();
+            $response = [
+                "success" => true,
+                "data" => $datas 
+            ];
+        } catch (PDOException $e) {
+            $response = [
+                "success" => false,
+                "error" => $e->getMessage()
+            ];
+            }
+            return $response;
+    }
+
+    function getAttendanceTrendsByEmployeeId($id, $pdo) {
+    
+        $query = "WITH monthly_attendance AS (
+    SELECT 
+        t.employee_id,
+        DATE_FORMAT(t.schedule_day, '%Y-%m') as month,
+        YEAR(t.schedule_day) as year,
+        MONTH(t.schedule_day) as month_num,
+        MONTHNAME(t.schedule_day) as month_name,
+        COUNT(*) as total_days,
+        SUM(CASE WHEN t.attendance_status = 'Present' THEN 1 ELSE 0 END) as present_days,
+        SUM(CASE WHEN t.attendance_status = 'Late' THEN 1 ELSE 0 END) as late_days,
+        SUM(CASE WHEN t.attendance_status = 'Absent' THEN 1 ELSE 0 END) as absent_days,
+        -- Punctuality rate: (Present days / Total days) * 100
+        ROUND((SUM(CASE WHEN t.attendance_status = 'Present' THEN 1 ELSE 0 END) * 100.0 / COUNT(*)), 2) as punctuality_rate
+    FROM time_and_attendance t
+    INNER JOIN employee_schedules es 
+        ON t.employee_id = es.employee_id
+        AND DAYNAME(t.schedule_day) = es.day_of_week
+    WHERE t.employee_id = :employee_id -- Replace with specific employee_id
+      AND YEAR(t.schedule_day) = YEAR(CURDATE()) -- Current year only
+    GROUP BY t.employee_id, DATE_FORMAT(t.schedule_day, '%Y-%m')
+),
+punctuality_improvement AS (
+    SELECT 
+        employee_id,
+        month,
+        year,
+        month_num,
+        month_name,
+        total_days,
+        present_days,
+        late_days,
+        absent_days,
+        punctuality_rate,
+        -- Previous month's punctuality rate
+        LAG(punctuality_rate) OVER (PARTITION BY employee_id ORDER BY year, month_num) as prev_month_punctuality,
+        -- Calculate improvement
+        ROUND(
+            punctuality_rate - LAG(punctuality_rate) OVER (PARTITION BY employee_id ORDER BY year, month_num),
+            2
+        ) as punctuality_improvement,
+        -- Percentage improvement
+        ROUND(
+            ((punctuality_rate - LAG(punctuality_rate) OVER (PARTITION BY employee_id ORDER BY year, month_num)) / 
+            NULLIF(LAG(punctuality_rate) OVER (PARTITION BY employee_id ORDER BY year, month_num), 0)) * 100,
+            2
+        ) as punctuality_improvement_percentage
+    FROM monthly_attendance
+)
+SELECT 
+    employee_id,
+    year,
+    month_name,
+    month,
+    total_days,
+    present_days,
+    late_days,
+    absent_days,
+    punctuality_rate,
+    prev_month_punctuality,
+    COALESCE(punctuality_improvement, 0) as punctuality_improvement,
+    COALESCE(punctuality_improvement_percentage, 0) as punctuality_improvement_percentage,
+    CASE 
+        WHEN punctuality_improvement > 0 THEN 'Improved'
+        WHEN punctuality_improvement < 0 THEN 'Declined'
+        WHEN punctuality_improvement = 0 THEN 'No Change'
+        ELSE 'First Month'
+    END as trend_status
+FROM punctuality_improvement
+ORDER BY year, month_num";
+        try {
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([
+                ":employee_id" => $id
+            ]);
+
+            $datas = $stmt->fetchAll();
+            $response = [
+                "success" => true,
+                "data" => $datas 
+            ];
+        } catch (PDOException $e) {
+            $response = [
+                "success" => false,
+                "error" => $e->getMessage()
+            ];
+            }
+            return $response;
+    }
+    function getTotalRewardsThisYear($id, $pdo) {
+    
+        $query = "SELECT COUNT(*) AS total_rewards FROM `incentive_awards` WHERE employee_id = :employee_id AND YEAR(award_date) = YEAR(CURDATE())";
+        try {
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([
+                ":employee_id" => $id
+            ]);
+
+            $datas = $stmt->fetch();
+            $response = [
+                "success" => true,
+                "data" => $datas 
+            ];
+        } catch (PDOException $e) {
+            $response = [
+                "success" => false,
+                "error" => $e->getMessage()
+            ];
+            }
+            return $response;
+    }
+
 
 ?>
