@@ -278,8 +278,7 @@ ORDER BY lt.leave_type_id ASC
 
     function getAllAttendanceRecord($pdo) {
     
-        $query = "SELECT * FROM time_and_attendance
-";
+        $query = "SELECT * FROM time_and_attendance";   
         try {
             $stmt = $pdo->prepare($query);
             $stmt->execute();
@@ -334,6 +333,30 @@ GROUP BY
             $stmt->execute();
 
             $datas = $stmt->fetch();
+            $response = [
+                "success" => true,
+                "data" => $datas 
+            ];
+        } catch (PDOException $e) {
+            $response = [
+                "success" => false,
+                "error" => $e->getMessage()
+            ];
+            }
+            return $response;
+    }
+
+
+   function getAllAttendanceRecordById($id, $pdo) {
+    
+        $query = "SELECT * FROM time_and_attendance WHERE employee_id = :employee_id";   
+        try {
+            $stmt = $pdo->prepare($query);
+            $stmt->execute([
+                ":employee_id" => $id
+            ]); 
+
+            $datas = $stmt->fetchAll();
             $response = [
                 "success" => true,
                 "data" => $datas 

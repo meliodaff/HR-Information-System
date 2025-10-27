@@ -27,6 +27,9 @@ const useGetAttendanceRecord = () => {
     setLoadingForGetOverAllAttendancePerMonth,
   ] = useState(false);
 
+  const [loadingForAllAttendanceById, setLoadingForAllAttendanceById] =
+    useState(false);
+
   const getAttendanceRecords = async (date) => {
     const newDate = new Date(date).toISOString().split("T")[0];
     console.log(newDate);
@@ -174,6 +177,29 @@ const useGetAttendanceRecord = () => {
     }
   };
 
+  const getAllAttendanceById = async (id) => {
+    try {
+      setLoadingForAllAttendanceById(true);
+      const response = await axios.get(
+        `/getAttendanceRecord.php?id=${id}&all=true`
+      );
+      return response.data;
+    } catch (error) {
+      if (error.status >= 400) {
+        return {
+          success: false,
+          message: error.response.data.message,
+        };
+      }
+      return {
+        success: false,
+        message: "API calling failed",
+      };
+    } finally {
+      setLoadingForAllAttendanceById(false);
+    }
+  };
+
   return {
     getAttendanceRecords,
     loadingForGetAttendanceRecords,
@@ -187,6 +213,8 @@ const useGetAttendanceRecord = () => {
     getAttendanceRecordForMonth,
     getOverAllAttendancePerMonth,
     loadingForGetOverAllAttendancePerMonth,
+    getAllAttendanceById,
+    loadingForAllAttendanceById,
   };
 };
 

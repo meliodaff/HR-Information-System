@@ -1,144 +1,355 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import EmployeeNavbar from "../components/Sections/EmployeeNavbar";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Link } from "react-router-dom";
+import useGetAttendanceRecord from "../api/useGetAttendanceRecord";
 export default function EmployeeSchedule({ employee }) {
   const [activeTab, setActiveTab] = useState("attendance");
   const [currentMonth, setCurrentMonth] = useState(new Date(2025, 8, 1)); // September 2025
   const [hoveredDate, setHoveredDate] = useState(null);
 
-  // Sample schedule data
-  const scheduleData = {
-    "2025-09-01": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-02": {
-      status: "late",
-      timeIn: "11:30 AM",
-      timeOut: "6:30 PM",
-      remarks: "1 hour and 30 mins late",
-    },
-    "2025-09-03": {
-      status: "present",
-      timeIn: "7:55 AM",
-      timeOut: "5:00 PM",
-      remarks: "Early arrival",
-    },
-    "2025-09-04": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-05": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-08": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-09": { status: "absent", remarks: "Unexcused absence" },
-    "2025-09-10": {
-      status: "present",
-      timeIn: "8:05 AM",
-      timeOut: "5:00 PM",
-      remarks: "Slightly late",
-    },
-    "2025-09-11": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-12": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-15": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-16": {
-      status: "present",
-      timeIn: "7:50 AM",
-      timeOut: "5:00 PM",
-      remarks: "Training session at 3 PM",
-    },
-    "2025-09-17": {
-      status: "late",
-      timeIn: "9:15 AM",
-      timeOut: "5:00 PM",
-      remarks: "1 hour 15 mins late",
-    },
-    "2025-09-18": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-19": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-22": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-23": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-24": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-25": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-26": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "Weekend coverage",
-    },
-    "2025-09-29": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "On time",
-    },
-    "2025-09-30": {
-      status: "present",
-      timeIn: "8:00 AM",
-      timeOut: "5:00 PM",
-      remarks: "Month-end closing",
-    },
-  };
+  const [scheduleData, setScheduleData] = useState([]);
+  const { getAllAttendanceById } = useGetAttendanceRecord();
+  // useEffect(() => {
+  //   const useGetAllAttendanceById = async (id) => {
+  //     const response = await getAllAttendanceById(id);
+  //     if (!response.success) {
+  //       alert(response.message);
+  //       return;
+  //     }
+  //     console.log(response.data);
+  //     const formattedData = response.data.map((data) => {
+  //       if (!data.check_in_time && !data.check_out_time) {
+  //         return {
+  //           status: data.attendance_status,
+  //           remarks: data.notes || " - ",
+  //         };
+  //       }
+
+  //       const timeInDate = new Date(data.check_in_time.replace(" ", "T")); // Replace space with 'T' for ISO format
+  //       const timeOutDate = new Date(data.check_out_time.replace(" ", "T")); // Replace space with 'T' for ISO format
+
+  //       const formattedTimeIn = timeInDate.toLocaleTimeString([], {
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         hour12: true,
+  //       });
+  //       const formattedTimeOut = timeOutDate.toLocaleTimeString([], {
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         hour12: true,
+  //       });
+
+  //       return {
+  //         status: data.attendance_status.toLowerCase(),
+  //         timeIn: formattedTimeIn,
+  //         timeOut: formattedTimeOut,
+  //         remarks: data.notes || " - ",
+  //       };
+  //     });
+
+  //     console.log(formattedData);
+  //     setScheduleData(formattedData);
+  //   };
+
+  //   useGetAllAttendanceById(1);
+  // }, []);
+
+  // "2025-09-01": {
+  //   status: "present",
+  //   timeIn: "8:00 AM",
+  //   timeOut: "5:00 PM",
+  //   remarks: "On time",
+  // },
+
+  // const scheduleData = {
+  //   "2025-09-01": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-02": {
+  //     status: "late",
+  //     timeIn: "11:30 AM",
+  //     timeOut: "6:30 PM",
+  //     remarks: "1 hour and 30 mins late",
+  //   },
+  //   "2025-09-03": {
+  //     status: "present",
+  //     timeIn: "7:55 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "Early arrival",
+  //   },
+  //   "2025-09-04": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-05": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-08": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-09": { status: "absent", remarks: "Unexcused absence" },
+  //   "2025-09-10": {
+  //     status: "present",
+  //     timeIn: "8:05 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "Slightly late",
+  //   },
+  //   "2025-09-11": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-12": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-15": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-16": {
+  //     status: "present",
+  //     timeIn: "7:50 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "Training session at 3 PM",
+  //   },
+  //   "2025-09-17": {
+  //     status: "late",
+  //     timeIn: "9:15 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "1 hour 15 mins late",
+  //   },
+  //   "2025-09-18": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-19": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-22": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-23": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-24": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-25": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-26": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "Weekend coverage",
+  //   },
+  //   "2025-09-29": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "On time",
+  //   },
+  //   "2025-09-30": {
+  //     status: "present",
+  //     timeIn: "8:00 AM",
+  //     timeOut: "5:00 PM",
+  //     remarks: "Month-end closing",
+  //   },
+  // };
 
   // Function to check if day is weekend
+
+  // useEffect(() => {
+  //   const useGetAllAttendanceById = async (id) => {
+  //     const response = await getAllAttendanceById(id);
+  //     if (!response.success) {
+  //       alert(response.message);
+  //       return;
+  //     }
+  //     console.log(response.data);
+
+  //     const formattedData = response.data.reduce((acc, data) => {
+  //       // Skip records without attendance_date
+  //       if (!data.schedule_day) {
+  //         console.warn("Skipping record without date:", data);
+  //         return acc;
+  //       }
+
+  //       // Use attendance_date as the key (YYYY-MM-DD format)
+  //       const dateKey = data.schedule_day;
+
+  //       // Handle absent or records without times
+  //       if (!data.check_in_time && !data.check_out_time) {
+  //         acc[dateKey] = {
+  //           status: data.attendance_status?.toLowerCase() || "unknown",
+  //           remarks: data.notes || " - ",
+  //         };
+  //         return acc;
+  //       }
+
+  //       // Format times
+  //       const timeInDate = new Date(data.check_in_time.replace(" ", "T"));
+  //       const timeOutDate = new Date(data.check_out_time.replace(" ", "T"));
+
+  //       const formattedTimeIn = timeInDate.toLocaleTimeString([], {
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         hour12: true,
+  //       });
+  //       const formattedTimeOut = timeOutDate.toLocaleTimeString([], {
+  //         hour: "2-digit",
+  //         minute: "2-digit",
+  //         hour12: true,
+  //       });
+
+  //       acc[dateKey] = {
+  //         status: data.attendance_status?.toLowerCase() || "unknown",
+  //         timeIn: formattedTimeIn,
+  //         timeOut: formattedTimeOut,
+  //         remarks:
+  //           data.notes === "on leave"
+  //             ? "leave"
+  //             : data.notes
+  //             ? data.notes
+  //             : " - ",
+  //       };
+
+  //       return acc;
+  //     }, {}); // Start with empty object
+
+  //     console.log(formattedData);
+  //     setScheduleData(formattedData);
+  //   };
+
+  //   useGetAllAttendanceById(1);
+  // }, []);
+
+  useEffect(() => {
+    const fetchAndFormatAttendance = async (id) => {
+      const response = await getAllAttendanceById(id);
+
+      if (!response.success) {
+        alert(response.message);
+        return;
+      }
+
+      const formattedData = formatAttendanceData(response.data);
+      const completeData = fillMissingDaysAsOff(formattedData);
+
+      setScheduleData(completeData);
+    };
+
+    fetchAndFormatAttendance(1);
+  }, []);
+
+  // Helper function to format a single attendance record
+  const formatAttendanceRecord = (data) => {
+    const status = data.attendance_status?.toLowerCase() || "unknown";
+    const isLeave = status === "on leave" || status === "leave";
+
+    // Base record structure
+    const record = {
+      status: isLeave ? "leave" : status,
+      remarks: data.notes || " - ",
+    };
+
+    // Add time information if available
+    if (data.check_in_time && data.check_out_time) {
+      const formatTime = (timeString) => {
+        const date = new Date(timeString.replace(" ", "T"));
+        return date.toLocaleTimeString([], {
+          hour: "2-digit",
+          minute: "2-digit",
+          hour12: true,
+        });
+      };
+
+      record.timeIn = formatTime(data.check_in_time);
+      record.timeOut = formatTime(data.check_out_time);
+    }
+
+    return record;
+  };
+
+  // Format all attendance data from API
+  const formatAttendanceData = (dataArray) => {
+    return dataArray.reduce((acc, data) => {
+      if (!data.schedule_day) {
+        console.warn("Skipping record without date:", data);
+        return acc;
+      }
+
+      acc[data.schedule_day] = formatAttendanceRecord(data);
+      return acc;
+    }, {});
+  };
+
+  // Fill missing weekdays as day off
+  const fillMissingDaysAsOff = (data) => {
+    const result = { ...data };
+    const dates = Object.keys(data);
+
+    if (dates.length === 0) return result;
+
+    const sortedDates = dates.sort();
+    const startDate = new Date(sortedDates[0]);
+    const endDate = new Date(sortedDates[sortedDates.length - 1]);
+
+    let currentDate = new Date(startDate);
+
+    while (currentDate <= endDate) {
+      const dateKey = currentDate.toISOString().split("T")[0];
+      const dayOfWeek = currentDate.getDay();
+      const isWeekday = dayOfWeek !== 0 && dayOfWeek !== 6;
+
+      if (!result[dateKey] && isWeekday) {
+        result[dateKey] = {
+          status: "dayoff",
+          remarks: "Day Off",
+        };
+      }
+
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    return result;
+  };
+
   const isWeekend = (day) => {
     const date = new Date(year, month, day);
     const dayOfWeek = date.getDay();

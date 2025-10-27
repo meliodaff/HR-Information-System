@@ -17,6 +17,7 @@ if($REQUEST_METHOD === "GET"){
     $month = isset($_GET["month"]) ? $_GET["month"] : null;
     $attendanceSummary = isset($_GET["attendanceSummary"]) ? $_GET["attendanceSummary"] : null;
     $overAllAttendance = isset($_GET["overAllAttendance"]) ? $_GET["overAllAttendance"] : null;
+    $all = isset($_GET["all"]) ? $_GET["all"] : null; // what a variable name xD
 
     if($idParams && $date) {
         $response = getAttendanceRecord($idParams, $date, $pdo);
@@ -27,6 +28,9 @@ if($REQUEST_METHOD === "GET"){
     else if ($attendanceSummary && $idParams) {
         $response = getAttendanceSummary($idParams, $pdo);
     } 
+    else if ($idParams && $all === "true") {
+        $response = getAllAttendanceRecordById($idParams, $pdo);
+    }
     else if($idParams) {
         // employeee id attendance record for today
         $response = getAttendanceRecordForToday($idParams, $pdo);
