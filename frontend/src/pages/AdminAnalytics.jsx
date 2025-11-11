@@ -48,10 +48,11 @@ export default function AdminAnalytics() {
       console.log(record);
 
       const formattedData = {
-        overallAttendance: record.attendance.overall_attendance_percentage,
-        avgPerformance: record.performance.average_performance,
+        overallAttendance:
+          record.attendance?.overall_attendance_percentage ?? 0,
+        avgPerformance: record.performance?.average_performance ?? 0,
         totalIncentives:
-          record.totalIncentivesGivenByMonth.total_incentives_value,
+          record.totalIncentivesGivenByMonth?.total_incentives_value ?? 0,
       };
 
       const present_count = +record.attendance.present_count;

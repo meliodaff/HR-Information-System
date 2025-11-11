@@ -144,7 +144,13 @@ while (true) {
             continue;
         }
 
-        $responseFromTimeInController = timeIn($employeeId, $line, $pdo);
+        $attendanceStatus = "Present";
+        if(strtotime(date("H:i")) > strtotime("09:15")){
+            $attendanceStatus = "Late";
+        }
+            
+
+        $responseFromTimeInController = timeIn($employeeId, $attendanceStatus, $line, $pdo);
         echo "{$responseFromTimeInController["message"]}\n";
         
         sendMessageToClient($client, $employeeId, $line, $response["full_name"], ($messageFromIsForgotToTimeOut ?? " ") . " <br/>" . $responseFromTimeInController["message"], "time_in", date("h:i:s A"), null, $photo);

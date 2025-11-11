@@ -1,15 +1,16 @@
 <?php
     // include_once __DIR__ . "/../config/database.php";
 
-    function timeIn($employeeId, $rfid, $pdo){
+    function timeIn($employeeId, $attendanceStatus, $rfid, $pdo){
 
         $query = "INSERT INTO time_and_attendance (employee_id, check_in_time, schedule_day, attendance_status)
-VALUES (:employee_id, CURTIME(), NOW(), 'Present')"; // the 'Present' needs to be dynamic
+VALUES (:employee_id, CURTIME(), NOW(), :attendanceStatus)"; // the 'Present' needs to be dynamic
 
         try {
             $stmt = $pdo->prepare($query);
             $isTimeIn = $stmt->execute([
-                ":employee_id" => $employeeId
+                ":employee_id" => $employeeId,
+                ":attendanceStatus" => $attendanceStatus
             ]);
 
 
